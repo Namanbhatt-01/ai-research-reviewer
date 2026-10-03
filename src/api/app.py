@@ -361,7 +361,17 @@ def revise_section(topic: str):
     suggestions = reviewer.suggest_revisions(section_name, current_text, evaluation)
     overall_score = evaluation.get("overall", 0.0)
     
-    refined_text = reviewer.refine_section(section_name, current_text, suggestions)
+    # Load empirical findings context to ground the revision
+    findings_path = os.path.join(config.ANALYSIS_DIR, topic, "key_findings.json")
+    findings_context = None
+    if os.path.exists(findings_path):
+        try:
+            with open(findings_path, "r", encoding="utf-8") as f:
+                findings_context = f.read()
+        except Exception:
+            pass
+
+    refined_text = reviewer.refine_section(section_name, current_text, suggestions, context=findings_context)
     if not refined_text:
         return jsonify({"error": "GPT failed to refine the section"}), 500
 

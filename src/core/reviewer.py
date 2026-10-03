@@ -175,28 +175,33 @@ Section text:
         return []
 
     def refine_section(
-        self, name: str, text: str, suggestions: List[str]
+        self, name: str, text: str, suggestions: List[str], context: Optional[str] = None
     ) -> Optional[str]:
         """
-        Rewrites *text* guided by *suggestions*, producing an improved section.
+        Rewrites *text* guided by *suggestions* and optional *context*, producing an improved section.
 
         Args:
             name:        Section name for context.
             text:        Original section text to refine.
             suggestions: Revision suggestions from suggest_revisions().
+            context:     Verified empirical paper findings or metadata to ground the prose.
 
         Returns:
             Refined section text, or None on failure.
         """
         logger.info(f"Refining '{name}' section...")
         bullet_suggestions = "\n".join(f"- {s}" for s in suggestions)
-        prompt = f"""Rewrite the **{name}** section of an academic paper to address the following suggestions:
+        context_block = f"\nEmpirical Context & Verified Research Findings:\n{context}\n" if context else ""
+        prompt = f"""Rewrite the **{name}** section of an academic systematic review to address the following editorial critique:
 {bullet_suggestions}
+{context_block}
+Requirements:
+1. Write in fluent, authoritative, publication-quality academic English.
+2. Ground all statements in concrete technical specifics (exact model names, architectural mechanisms, benchmark metrics, datasets, and author attributions). Avoid vague generic filler like 'advanced algorithmic architectures'.
+3. Preserve all verified empirical numbers, equations, and in-text citations.
+4. If this is the 'Abstract' section, keep it concise and under 120 words.
 
-Write in full academic paragraphs. Preserve all factual content and citations.
-Only improve clarity, rigor, completeness, and structure.
-
-Original text:
+Original section text:
 \"\"\"
 {text[:6000]}
 \"\"\"
