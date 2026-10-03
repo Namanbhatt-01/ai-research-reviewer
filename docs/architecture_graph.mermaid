@@ -1,0 +1,53 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	process_input(process_input)
+	planner(planner)
+	researcher(researcher)
+	search_articles(search_articles)
+	article_decisions(article_decisions)
+	download_articles(download_articles)
+	paper_analyzer(paper_analyzer)
+	write_abstract(write_abstract)
+	write_conclusion(write_conclusion)
+	write_introduction(write_introduction)
+	write_methods(write_methods)
+	write_references(write_references)
+	write_results(write_results)
+	aggregate_paper(aggregate_paper)
+	critique_paper(critique_paper)
+	revise_paper(revise_paper)
+	final_draft(final_draft)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> process_input;
+	aggregate_paper --> critique_paper;
+	article_decisions --> download_articles;
+	critique_paper -.-> final_draft;
+	critique_paper -.-> revise_paper;
+	critique_paper -.-> search_articles;
+	download_articles --> paper_analyzer;
+	paper_analyzer --> write_abstract;
+	paper_analyzer --> write_conclusion;
+	paper_analyzer --> write_introduction;
+	paper_analyzer --> write_methods;
+	paper_analyzer --> write_references;
+	paper_analyzer --> write_results;
+	planner --> researcher;
+	process_input --> planner;
+	researcher --> search_articles;
+	revise_paper --> critique_paper;
+	search_articles --> article_decisions;
+	write_abstract --> aggregate_paper;
+	write_conclusion --> aggregate_paper;
+	write_introduction --> aggregate_paper;
+	write_methods --> aggregate_paper;
+	write_references --> aggregate_paper;
+	write_results --> aggregate_paper;
+	final_draft --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

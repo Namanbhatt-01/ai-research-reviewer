@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Research Reviewer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            /* Professional Minimalist SaaS Palette */
+            --bg-color: #f3f4f6;
+            --surface-color: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --primary: #111827;
+            --primary-hover: #374151;
+            --success: #059669;
+            --danger: #dc2626;
+            --pending: #d97706;
+            --accent-glow: rgba(17, 24, 39, 0.05);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 6px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Solid Navbar --- */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        .navbar .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* --- Hero Search Section --- */
+        .search-section {
+            background: var(--surface-color);
+            padding: 3rem 2rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-section h2 {
+            margin-bottom: 0.75rem;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+
+        .search-section p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1.1rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 650px;
+            margin: 0 auto;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 4px var(--accent-glow);
+            border-color: var(--primary);
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+            font-weight: 500;
+        }
+
+        button {
+            padding: 0.75rem 1.75rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* --- Layout Grid --- */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- Panels & Cards --- */
+        .panel {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* --- Pipeline & Phases --- */
+        .phase-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            transition: background-color 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .phase-item.active {
+            background-color: var(--accent-glow);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .phase-item.completed {
+            color: var(--success);
+        }
+
+        .phase-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background-color: #f1f5f9;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .completed .phase-icon {
+            background-color: #d1fae5;
+            color: var(--success);
+        }
+
+        .active .phase-icon {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* --- Paper Cards --- */
+        .paper-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .paper-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .paper-card h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .paper-card .meta {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .paper-card .abstract {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: #475569;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #cbd5e1;
+        }
+
+        /* --- Specialized UI Elements --- */
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.running {
+            background: var(--accent-glow);
+            color: var(--primary);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .cache-notice {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        /* --- History Sidebar Refinement --- */
+        #history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .history-group-title {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin: 1.5rem 0 0.75rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-group-title:first-child {
+            margin-top: 0;
+        }
+
+        .history-item {
+            position: relative;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .history-item:hover {
+            background: white;
+            border-color: var(--primary);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-item .topic {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 3rem;
+        }
+
+        .history-item .meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .history-item .time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .history-actions {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: flex;
+            gap: 0.4rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .history-item:hover .history-actions {
+            opacity: 1;
+        }
+
+        .action-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            background: #f1f5f9;
+            color: #64748b;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .action-icon:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-icon.delete:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <div style="background: var(--accent-glow); padding: 0.5rem; border-radius: 10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary)">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+            </div>
+            <div>
+                <h1>AI Research Platform</h1>
+                <div class="brand-subtitle">Academic Synthesis</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="search-section">
+            <h2>Start Your Research</h2>
+            <p>Enter a scientific discipline to gather, extract, and synthesize the latest academic papers.</p>
+            <div class="search-bar">
+                <input type="text" id="topic-input" placeholder=" Search Topics "
+                    onkeypress="if(event.key === 'Enter') startResearch()">
+                <button id="search-btn" onclick="startResearch()">Search</button>
+            </div>
+        </section>
+
+        <div class="grid-layout">
+            <!-- Left Sidebar -->
+            <aside>
+                <div class="panel" id="history-panel">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        Recent Reports
+                    </h3>
+                    <div id="history-list">
+                        <p
+                            style="color: var(--text-secondary); font-size: 0.875rem; text-align: center; padding: 1rem;">
+                            No history yet.</p>
+                    </div>
+                </div>
+
+                <div class="panel" id="pipeline-panel" style="display: none;">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m22 2-7 20-4-9-9-4Z" />
+                            <path d="M22 2 11 13" />
+                        </svg>
+                        Pipeline Status
+                    </h3>
+                    <div id="phases"></div>
+                    <a href="#" class="report-btn" id="final-report-btn">View Full Report</a>
+                </div>
+            </aside>
+
+            <!-- Main Workspace -->
+            <main class="panel" id="workspace-main" style="display: none;">
+                <!-- Research Strategy Board -->
+                <div id="strategy-board"
+                    style="display: none; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3
+                        style="margin-bottom: 1.25rem; color: var(--primary); font-size: 1rem; display: flex; align-items: center; gap: 0.75rem; text-transform: none; letter-spacing: normal;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        Research Strategy
+                    </h3>
+                    <div id="strategy-content" style="font-size: 0.85rem; line-height: 1.6;">
+                        <p style="color: var(--text-secondary);">Generating research plan...</p>
+                    </div>
+                </div>
+
+                <!-- Cache Notice Header -->
+                <div id="cache-notice-area"></div>
+
+                <!-- Search Results -->
+                <div id="papers-list" class="papers-grid">
+                    <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Searching papers...</p>
+                </div>
+                <button class="process-btn" id="process-btn" onclick="processPapers()">Start Synthesis Engine</button>
+            </main>
+
+            <!-- Welcome placeholder when no search is active -->
+            <div id="welcome-panel"
+                style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 3rem; text-align: center; color: var(--text-secondary);">
+                <div style="margin-bottom: 1rem; color: var(--text-secondary); display: flex; justify-content: center;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                    </svg>
+                </div>
+                <h3>Welcome to the Academic Synthesis Engine</h3>
+                <p>Enter a topic above to generate a highly educational, factual report.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const phasesTemplate = ["planning", "retrieval", "extraction", "analysis", "drafting", "review", "html"];
+        const phaseNames = {
+            "planning": "Research Planning",
+            "retrieval": "Initial Paper Search",
+            "retrieval_0": "Initial Paper Search",
+            "retrieval_1": "Secondary Gap Search",
+            "extraction": "Text Extraction",
+            "analysis": "Findings Analysis",
+            "analysis_0": "Initial Analysis",
+            "analysis_1": "Gap Enrichment",
+            "drafting": "Draft Generation",
+            "review": "Peer Review",
+            "html": "Report Compilation"
+        };
+
+        let currentSlug = null;
+        let pollInterval = null;
+        let targetProcessing = false;
+        let strategyFetched = false;
+        let lastKnownTasks = [];
+        let searchResults = [];
+
+        function getHeaders() {
+            return {
+                "Content-Type": "application/json",
+                "X-API-Key": "{{ api_key }}"
+            };
+        }
+
+        function timeAgo(dateString) {
+            const date = new Date(dateString + "Z"); // Handle SQLite UTC
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + "y ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + "mo ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + "d ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + "h ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + "m ago";
+            return "just now";
+        }
+
+        async function fetchHistory() {
+            try {
+                const res = await fetch("/api/research/history", { headers: getHeaders() });
+                const data = await res.json();
+                const list = document.getElementById("history-list");
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    list.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.875rem; text-align: center; padding: 1rem;">No history yet.</p>`;
+                    return;
+                }
+
+                // Group by date
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                const groups = { today: [], yesterday: [], earlier: [] };
+                data.forEach(w => {
+                    const d = new Date(w.created_at + "Z");
+                    if (d >= today) groups.today.push(w);
+                    else if (d >= yesterday) groups.yesterday.push(w);
+                    else groups.earlier.push(w);
+                });
+
+                let html = "";
+                const renderGroup = (title, items) => {
+                    if (items.length === 0) return "";
+                    return `
+                        <div class="history-group">
+                            <div class="history-group-title">${title}</div>
+                            ${items.map(w => `
+                                <div class="history-item" onclick="resumeWorkflow('${w.topic_name.replace(/'/g, "\\'")}', '${w.topic_slug}')">
+                                    <div class="topic" title="${w.topic_name}">${w.topic_name}</div>
+                                    <div class="meta-row">
+                                        <span class="status-badge ${w.status.toLowerCase()}">${w.status}</span>
+                                        <span class="time">${timeAgo(w.created_at)}</span>
+                                    </div>
+                                    <div class="history-actions">
+                                        ${w.status === 'COMPLETED' ? `
+                                            <button class="action-icon" onclick="event.stopPropagation(); window.open('/report/${w.topic_slug}?api_key={{ api_key }}', '_blank')" title="View Report">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 22 3 22 10"/><line x1="10" y1="14" x2="22" y2="2"/></svg>
+                                            </button>
+                                        ` : ''}
+                                        <button class="action-icon delete" onclick="event.stopPropagation(); deleteWorkflow('${w.topic_slug}')" title="Delete">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join("")}
+                        </div>
+                    `;
+                };
+
+                html += renderGroup("Today", groups.today);
+                html += renderGroup("Yesterday", groups.yesterday);
+                html += renderGroup("Earlier", groups.earlier);
+                list.innerHTML = html;
+            } catch (e) {
+                console.error("Failed to fetch history:", e);
+            }
+        }
+
+        async function deleteWorkflow(slug) {
+            if (!confirm(`Are you sure you want to delete the research history for "${slug}"? This will remove all associated drafts and metadata.`)) return;
+            try {
+                const res = await fetch(`/api/research/${slug}/delete`, {
+                    method: "DELETE",
+                    headers: getHeaders()
+                });
+                if (res.ok) {
+                    fetchHistory();
+                    if (currentSlug === slug) {
+                        location.reload(); // Reset UI if we deleted the active workflow
+                    }
+                }
+            } catch (e) {
+                console.error("Delete failed:", e);
+                alert("Failed to delete research.");
+            }
+        }
+
+        async function resumeWorkflow(topic, slug) {
+            document.getElementById("topic-input").value = topic;
+            currentSlug = slug;
+            
+            // RESET GLOBAL STATE
+            strategyFetched = false;
+            targetProcessing = false;
+            searchResults = [];
+            lastKnownTasks = [];
+            
+            // RESET UI PANELS
+            document.getElementById("strategy-board").style.display = "none";
+            document.getElementById("final-report-btn").style.display = "none";
+            document.getElementById("process-btn").style.display = "none";
+            document.getElementById("welcome-panel").style.display = "none";
+            document.getElementById("workspace-main").style.display = "block";
+            document.getElementById("pipeline-panel").style.display = "block";
+            
+            // Trigger a poll to show current state
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(pollStatus, 2000);
+            pollStatus();
+            
+            // Also try to fetch papers from metadata
+            try {
+                const res = await fetch(`/api/research/${slug}/papers`, { headers: getHeaders() });
+                const papers = await res.json();
+                if (Array.isArray(papers) && papers.length > 0) {
+                    searchResults = papers;
+                    showSearchResults(false); // don't show cache notice here
+                } else {
+                    document.getElementById("papers-list").innerHTML = "";
+                }
+            } catch (e) {
+                console.error("Failed to resume papers:", e);
+                document.getElementById("papers-list").innerHTML = "";
+            }
+        }
+
+        function renderPhases(tasks) {
+            lastKnownTasks = tasks;
+            const container = document.getElementById("phases");
+            container.innerHTML = "";
+
+            let foundRunning = false;
+
+            phasesTemplate.forEach((p, idx) => {
+                const task = tasks.find(t => (t.phase_name === p) || (t.phase_name.startsWith(p + "_")));
+                const status = task ? task.status : "PENDING";
+                const displayName = task ? (phaseNames[task.phase_name] || phaseNames[p]) : phaseNames[p];
+                let icon = idx + 1;
+                let statusClass = "";
+                if (status === "COMPLETED") { statusClass = "completed"; icon = "✓"; }
+                else if (status === "FAILED") { statusClass = "failed"; icon = "✗"; }
+                else if (status === "RUNNING") { statusClass = "active"; foundRunning = true; }
+                else if (status === "PENDING" && !foundRunning) {
+                    // Logic to mark a pending task as "active" if it's the next one to run
+                    const anyRunning = tasks.some(t => t.status === "RUNNING");
+                    if (!anyRunning && (targetProcessing || tasks.length > 0)) {
+                        statusClass = "active";
+                        foundRunning = true;
+                    }
+                }
+
+                const errorHtml = (task && task.error_message) ? `<div style="font-size: 0.75rem; color: var(--danger); margin-top: 0.25rem;">${task.error_message}</div>` : '';
+
+                container.innerHTML += `
+                    <div class="phase-item ${statusClass}">
+                        <div class="phase-icon">${icon}</div>
+                        <div>
+                            <div style="font-size: 0.9rem;">${displayName}</div>
+                            <div style="font-size: 0.75rem; opacity: 0.8;">${status}</div>
+                            ${errorHtml}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function startResearch(bypassCache = false) {
+            const topicInput = document.getElementById("topic-input");
+            const topic = topicInput.value.trim();
+            if (!topic) return;
+
+            document.getElementById("search-btn").disabled = true;
+            topicInput.disabled = true;
+            document.getElementById("welcome-panel").style.display = "none";
+            document.getElementById("workspace-main").style.display = "block";
+            document.getElementById("pipeline-panel").style.display = "block";
+            document.getElementById("strategy-board").style.display = "none";
+            document.getElementById("final-report-btn").style.display = "none";
+            document.getElementById("process-btn").style.display = "none";
+            document.getElementById("process-btn").disabled = false;
+            document.getElementById("process-btn").innerText = "Process Selected Papers";
+            document.getElementById("papers-list").innerHTML = "<p style='color: var(--text-secondary);'>Searching papers...</p>";
+            document.getElementById("cache-notice-area").innerHTML = "";
+
+            targetProcessing = false;
+            strategyFetched = false;
+            renderPhases([]);
+
+            try {
+                const res = await fetch("/api/research/search", {
+                    method: "POST",
+                    headers: getHeaders(),
+                    body: JSON.stringify({ topic: topic, limit: 10, bypass_cache: bypassCache })
+                });
+                const data = await res.json();
+                searchResults = data.papers;
+                showSearchResults(data.cached);
+            } catch (e) {
+                console.error("Search failed:", e);
+                document.getElementById("papers-list").innerHTML = "<p style='color: var(--danger);'>Search failed.</p>";
+                document.getElementById("search-btn").disabled = false;
+                topicInput.disabled = false;
+            }
+        }
+
+        function showSearchResults(wasCached) {
+            const list = document.getElementById("papers-list");
+            const cacheArea = document.getElementById("cache-notice-area");
+
+            if (wasCached) {
+                cacheArea.innerHTML = `
+                    <div class="cache-notice">
+                        <span>Showing results from a previous search.</span>
+                        <button class="refresh-btn" onclick="startResearch(true)">Get Fresh Results</button>
+                    </div>
+                `;
+            } else {
+                cacheArea.innerHTML = "";
+            }
+
+            if (!searchResults || searchResults.length === 0) {
+                list.innerHTML = "<p style='color: var(--danger);'>No papers found.</p>";
+                document.getElementById("search-btn").disabled = false;
+                document.getElementById("topic-input").disabled = false;
+            } else {
+                list.innerHTML = searchResults.map((p, idx) => `
+                <div class="paper-card">
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <input type="checkbox" id="paper-${idx}" checked style="margin-top: 0.4rem; transform: scale(1.2);">
+                        <div style="flex: 1;">
+                            <h4><a href="${p.url || '#'}" target="_blank" style="color: inherit; text-decoration: none;">${p.title}</a></h4>
+                            <div class="meta">${p.authors ? p.authors.join(", ") : "Unknown Authors"} &bull; ${p.year || "Unknown"}</div>
+                            ${p.abstract ? `<div class="abstract"><strong>Abstract:</strong> ${p.abstract}</div>` : ""}
+                        </div>
+                    </div>
+                </div>
+                `).join("");
+                document.getElementById("process-btn").style.display = "block";
+            }
+        }
+
+        async function processPapers() {
+            const selectedIndices = searchResults.map((_, i) => i).filter(i => document.getElementById(`paper-${i}`).checked);
+            if (selectedIndices.length === 0) {
+                alert("Please select at least one paper.");
+                return;
+            }
+
+            const selectedPapers = selectedIndices.map(i => searchResults[i]);
+            const topic = document.getElementById("topic-input").value.trim();
+
+            document.getElementById("process-btn").disabled = true;
+            document.getElementById("process-btn").innerText = "Starting Pipeline...";
+            targetProcessing = true;
+
+            try {
+                const res = await fetch("/api/research/start", {
+                    method: "POST",
+                    headers: getHeaders(),
+                    body: JSON.stringify({ topic: topic, papers: selectedPapers })
+                });
+                const data = await res.json();
+                currentSlug = data.slug;
+
+                if (pollInterval) clearInterval(pollInterval);
+                pollInterval = setInterval(pollStatus, 2000);
+                pollStatus();
+                fetchHistory(); // Update sidebar
+            } catch (e) {
+                console.error("Failed to start processing:", e);
+                alert("Failed to start processing.");
+                document.getElementById("process-btn").disabled = false;
+            }
+        }
+
+        async function pollStatus() {
+            if (!currentSlug) return;
+            try {
+                const res = await fetch(`/api/research/${currentSlug}/status`, { headers: getHeaders() });
+                if (!res.ok) return;
+                const data = await res.json();
+                renderPhases(data.tasks || []);
+
+                const planningTask = data.tasks.find(t => t.phase_name === "planning");
+                if (planningTask && planningTask.status === "COMPLETED" && !strategyFetched) {
+                    fetchStrategy();
+                }
+
+                const htmlTask = data.tasks.find(t => t.phase_name === "html");
+                if (htmlTask && htmlTask.status === "COMPLETED") {
+                    clearInterval(pollInterval);
+                    const btn = document.getElementById("final-report-btn");
+                    btn.href = `/report/${currentSlug}?api_key={{ api_key }}`;
+                    btn.style.display = "block";
+
+                    document.getElementById("search-btn").disabled = false;
+                    document.getElementById("topic-input").disabled = false;
+                    fetchHistory(); // Refresh history to show COMPLETED status
+                }
+            } catch (e) {
+                console.error("Polling error:", e);
+            }
+        }
+
+        async function fetchStrategy() {
+            if (!currentSlug || strategyFetched) return;
+            try {
+                const res = await fetch(`/api/research/${currentSlug}/strategy`, { headers: getHeaders() });
+                if (!res.ok) return;
+                const strategy = await res.json();
+                strategyFetched = true;
+
+                const board = document.getElementById("strategy-board");
+                const content = document.getElementById("strategy-content");
+                board.style.display = "block";
+
+                content.innerHTML = `
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--text-primary);">Refined Topic:</strong> ${strategy.refined_topic}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--text-primary);">Key Questions:</strong>
+                        <ul style="margin-top: 0.4rem; padding-left: 1.2rem;">
+                            ${strategy.key_questions.map(q => `<li>${q}</li>`).join("")}
+                        </ul>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary);">Queries:</strong>
+                        <code style="display: block; background: #0f172a; padding: 0.75rem; margin-top: 0.4rem; border-radius: 4px; color: #a5b4fc; overflow-x: auto;">
+                            ${strategy.optimized_queries.join(" | ")}
+                        </code>
+                    </div>
+                `;
+            } catch (e) {
+                console.error("Failed to fetch strategy:", e);
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", fetchHistory);
+    </script>
+</body>
+
+</html>

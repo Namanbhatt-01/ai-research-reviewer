@@ -1,0 +1,30 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environment variables & secrets
+.env
+*.env.local
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Dynamic runtime data & databases
+logs/
+*.log
+data/state.db
+data/state.db-journal
+data/raw_pdfs/*
+!data/raw_pdfs/.gitkeep
+data/processed_text/*
+!data/processed_text/.gitkeep
+data/analysis/*
+!data/analysis/.gitkeep
+data/metadata/*
+!data/metadata/.gitkeep
+data/drafts/*
+!data/drafts/.gitkeep
