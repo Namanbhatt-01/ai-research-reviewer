@@ -29,42 +29,6 @@ Developed for the **Infosys Springboard Internship 6.0 (Batch 13)** under the me
 
 The pipeline is implemented as a state machine using **LangGraph StateGraph**. Execution flows from user input through parallel fan-out drafting nodes to an aggregation and revision review loop.
 
-```mermaid
-graph TD;
-    __start__([__start__]) --> process_input
-    process_input --> planner
-    planner --> researcher
-    researcher --> search_articles
-    search_articles --> article_decisions
-    article_decisions --> download_articles
-    download_articles --> paper_analyzer
-    
-    %% Parallel Fan-Out
-    paper_analyzer --> write_abstract
-    paper_analyzer --> write_conclusion
-    paper_analyzer --> write_introduction
-    paper_analyzer --> write_methods
-    paper_analyzer --> write_references
-    paper_analyzer --> write_results
-    
-    %% Aggregation
-    write_abstract --> aggregate_paper
-    write_conclusion --> aggregate_paper
-    write_introduction --> aggregate_paper
-    write_methods --> aggregate_paper
-    write_references --> aggregate_paper
-    write_results --> aggregate_paper
-    
-    aggregate_paper --> critique_paper
-    
-    %% Conditional Feedback Loops
-    critique_paper -.->|Research Gaps Detected| search_articles
-    critique_paper -.->|Score < 7.0| revise_paper
-    critique_paper -.->|Quality Approved| final_draft
-    
-    revise_paper --> critique_paper
-    final_draft --> __end__([__end__])
-```
 
 <p align="center">
   <img src="docs/architecture_graph.png" alt="StateGraph Architecture Diagram" width="800"/>
