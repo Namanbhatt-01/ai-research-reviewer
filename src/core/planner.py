@@ -52,7 +52,16 @@ class ResearchPlanner:
             
             plan = json.loads(response.choices[0].message.content)
             logger.info(f"[Planner] Strategy generated successfully.")
-            return plan
         except Exception as e:
-            logger.error(f"[Planner] Error generating research plan: {e}")
-            return None
+            logger.warning(f"[Planner] API call failed ({e}). Using deterministic academic research strategy fallback.")
+            return {
+                "refined_topic": topic,
+                "optimized_queries": [topic, f"{topic} architecture", f"{topic} survey"],
+                "key_questions": [
+                    f"What is the core technical architecture and motivation of {topic}?",
+                    f"What empirical benchmarks and performance results have been demonstrated?",
+                    f"What open problems, limitations, and future directions exist?"
+                ],
+                "structural_goal": f"A comprehensive systematic review of {topic}",
+                "suggested_sections": ["Abstract", "Introduction", "Methods", "Results", "Conclusion", "References"]
+            }
