@@ -55,6 +55,9 @@ class APAFormatter:
         first_last = self._last_name(authors[0])
         if len(authors) == 1:
             return f"({first_last}, {year})"
+        elif len(authors) == 2:
+            second_last = self._last_name(authors[1])
+            return f"({first_last} & {second_last}, {year})"
         return f"({first_last} et al., {year})"
 
     def format_reference_list(self, papers: List["PaperInfo"]) -> str:

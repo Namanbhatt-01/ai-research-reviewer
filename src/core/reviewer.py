@@ -383,6 +383,9 @@ Original text:
                     
             except Exception as e:
                 logger.warning(f"GPT call validation failed (attempt {attempt+1}/{max_retries}): {e}")
+                if "401" in str(e) or "expired" in str(e).lower() or "authentication" in str(e).lower():
+                    logger.warning("API key expired or unauthorized. Skipping self-correction retries.")
+                    break
                 # Feed the failure back into the GPT context so it can self-correct!
                 messages.append({"role": "assistant", "content": raw_text if raw_text else "{}"})
                 messages.append({"role": "user", "content": f"Your output triggered a validation error: {e}\nPlease correct the formatting and try again."})
