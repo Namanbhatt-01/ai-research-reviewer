@@ -1,15 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Systematic Literature Review System &mdash; Academic Evidence Synthesis</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX for Scholarly Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
     <style>
         :root {
+            /* Scholarly Light Theme */
             --bg-base: #f8fafc;
             --bg-surface: #ffffff;
             --bg-muted: #f1f5f9;
@@ -23,8 +32,8 @@
             --text-muted: #64748b;
             --text-light: #94a3b8;
             
-            --primary: #1e293b;
-            --primary-hover: #0f172a;
+            --primary: #0f172a;
+            --primary-hover: #1e293b;
             --accent: #2563eb;
             --accent-hover: #1d4ed8;
             --accent-subtle: #eff6ff;
@@ -41,14 +50,55 @@
             --danger-bg: #fef2f2;
             --danger-border: #fecaca;
             
-            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
             
             --radius-sm: 6px;
             --radius: 8px;
             --radius-lg: 12px;
+            --font-serif: 'Newsreader', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg-base: #090d16;
+            --bg-surface: #0f172a;
+            --bg-muted: #1e293b;
+            --bg-card: #0f172a;
+            
+            --border-subtle: #1e293b;
+            --border-strong: #334155;
+            
+            --text-heading: #f8fafc;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-light: #64748b;
+            
+            --primary: #f8fafc;
+            --primary-hover: #e2e8f0;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --accent-subtle: #1e293b;
+            
+            --success: #10b981;
+            --success-bg: #064e3b;
+            --success-border: #047857;
+            
+            --warning: #f59e0b;
+            --warning-bg: #78350f;
+            --warning-border: #b45309;
+            
+            --danger: #ef4444;
+            --danger-bg: #7f1d1d;
+            --danger-border: #b91c1c;
+            
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.5);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6);
         }
 
         * {
@@ -58,19 +108,20 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: var(--font-sans);
             background-color: var(--bg-base);
             color: var(--text-body);
             line-height: 1.6;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         /* ── Top Header Navigation ── */
         .top-navbar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-subtle);
-            padding: 0.85rem 2rem;
+            padding: 0.75rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -82,25 +133,27 @@
         .brand-container {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.85rem;
+            text-decoration: none;
+            cursor: pointer;
         }
 
         .brand-logo {
-            width: 36px;
-            height: 36px;
-            background: var(--primary);
-            color: white;
+            width: 34px;
+            height: 34px;
+            background: var(--text-heading);
+            color: var(--bg-surface);
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 1.1rem;
-            letter-spacing: -0.02em;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: -0.03em;
         }
 
         .brand-text h1 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--text-heading);
             letter-spacing: -0.015em;
@@ -111,7 +164,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -121,7 +174,7 @@
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 0.85rem;
+            gap: 0.75rem;
         }
 
         .btn-nav-action {
@@ -141,7 +194,25 @@
 
         .btn-nav-action:hover {
             background: var(--bg-muted);
-            border-color: var(--primary);
+            border-color: var(--text-heading);
+        }
+
+        .btn-theme-toggle {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-strong);
+            background: var(--bg-surface);
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-theme-toggle:hover {
+            background: var(--bg-muted);
         }
 
         .auth-chip {
@@ -160,7 +231,6 @@
         }
 
         .auth-chip:hover {
-            background: #e2e8f0;
             border-color: var(--border-strong);
         }
 
@@ -228,12 +298,12 @@
 
         .omnibar-input:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         .btn-primary {
             padding: 0.85rem 1.5rem;
-            background: var(--primary);
+            background: var(--accent);
             color: white;
             border: 1px solid transparent;
             border-radius: var(--radius);
@@ -248,7 +318,7 @@
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
+            background: var(--accent-hover);
         }
 
         .btn-primary:disabled {
@@ -293,7 +363,7 @@
         /* ── Workspace 2-Column Grid ── */
         .workbench-layout {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 310px 1fr;
             gap: 1.75rem;
             align-items: start;
         }
@@ -318,13 +388,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.15rem;
             padding-bottom: 0.75rem;
             border-bottom: 1px solid var(--border-subtle);
         }
 
         .card-title {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-heading);
             text-transform: uppercase;
@@ -338,14 +408,14 @@
         .pipeline-tracker {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.45rem;
         }
 
         .pipeline-step {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.65rem 0.75rem;
+            padding: 0.6rem 0.75rem;
             border-radius: var(--radius);
             border: 1px solid transparent;
             font-size: 0.82rem;
@@ -398,6 +468,23 @@
         }
 
         /* ── Sidebar: History List ── */
+        .history-search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-muted);
+            color: var(--text-heading);
+            font-size: 0.8rem;
+            margin-bottom: 0.85rem;
+            outline: none;
+        }
+
+        .history-search-input:focus {
+            border-color: var(--accent);
+            background: var(--bg-surface);
+        }
+
         .history-list {
             display: flex;
             flex-direction: column;
@@ -566,7 +653,7 @@
             margin-top: 0.25rem;
             width: 17px;
             height: 17px;
-            accent-color: var(--primary);
+            accent-color: var(--accent);
             cursor: pointer;
         }
 
@@ -658,7 +745,7 @@
             flex-wrap: wrap;
             gap: 1rem;
             padding-bottom: 1.25rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             border-bottom: 1px solid var(--border-subtle);
         }
 
@@ -681,6 +768,7 @@
 
         .report-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 0.5rem;
         }
 
@@ -701,23 +789,23 @@
 
         .btn-secondary:hover {
             background: var(--bg-muted);
-            border-color: var(--text-muted);
+            border-color: var(--text-heading);
         }
 
         /* ── Sticky Section Navigation Bar ── */
         .sticky-section-nav {
             position: sticky;
-            top: 61px;
+            top: 57px;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
+            background: var(--bg-surface);
             border-bottom: 1px solid var(--border-subtle);
-            padding: 0.5rem 0;
+            padding: 0.55rem 0;
             margin-bottom: 1.5rem;
             display: flex;
-            gap: 0.5rem;
+            gap: 0.45rem;
             overflow-x: auto;
             scrollbar-width: none;
+            box-shadow: var(--shadow-xs);
         }
 
         .sticky-section-nav::-webkit-scrollbar {
@@ -725,7 +813,7 @@
         }
 
         .section-nav-link {
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             font-weight: 600;
             color: var(--text-muted);
             text-decoration: none;
@@ -741,7 +829,7 @@
         }
 
         .section-nav-link.active {
-            background: var(--primary);
+            background: var(--accent);
             color: white;
         }
 
@@ -759,6 +847,13 @@
             border-radius: var(--radius);
             padding: 1rem 1.15rem;
             box-shadow: var(--shadow-xs);
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-strong);
         }
 
         .metric-label {
@@ -780,7 +875,7 @@
         .metric-bar {
             height: 4px;
             border-radius: 9999px;
-            background: #e2e8f0;
+            background: var(--border-subtle);
             margin-top: 0.6rem;
             overflow: hidden;
         }
@@ -811,6 +906,10 @@
             gap: 0.5rem;
         }
 
+        .matrix-table-wrap {
+            overflow-x: auto;
+        }
+
         .matrix-table {
             width: 100%;
             border-collapse: collapse;
@@ -818,7 +917,7 @@
         }
 
         .matrix-table th, .matrix-table td {
-            padding: 0.65rem 0.85rem;
+            padding: 0.75rem 0.95rem;
             border: 1px solid var(--border-subtle);
             text-align: left;
         }
@@ -834,10 +933,10 @@
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
-            padding: 1.75rem 2rem;
+            padding: 2rem 2.25rem;
             margin-bottom: 1.75rem;
             box-shadow: var(--shadow-xs);
-            scroll-margin-top: 120px;
+            scroll-margin-top: 110px;
         }
 
         .section-block.just-refined {
@@ -845,7 +944,7 @@
         }
 
         @keyframes highlight-pulse {
-            0% { border-color: var(--success); box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.2); }
+            0% { border-color: var(--success); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25); }
             100% { border-color: var(--border-subtle); box-shadow: var(--shadow-xs); }
         }
 
@@ -859,7 +958,7 @@
         }
 
         .section-heading {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--text-heading);
             letter-spacing: -0.015em;
@@ -910,7 +1009,7 @@
 
         .btn-critique:hover:not(:disabled) {
             background: var(--bg-muted);
-            border-color: var(--primary);
+            border-color: var(--accent);
         }
 
         .btn-critique:disabled {
@@ -918,10 +1017,29 @@
             cursor: not-allowed;
         }
 
+        .btn-copy-sec {
+            padding: 0.4rem 0.65rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.15s;
+        }
+
+        .btn-copy-sec:hover {
+            color: var(--text-heading);
+            border-color: var(--border-strong);
+        }
+
         .section-content-text {
-            font-size: 0.96rem;
+            font-size: 0.98rem;
             line-height: 1.85;
-            color: #27272a;
+            color: var(--text-body);
         }
 
         .section-content-text p {
@@ -930,7 +1048,7 @@
 
         .section-content-text ul, .section-content-text ol {
             margin-bottom: 1.25rem;
-            padding-left: 1.5rem;
+            padding-left: 1.75rem;
         }
 
         .section-content-text li {
@@ -942,9 +1060,17 @@
             color: var(--text-heading);
         }
 
+        .section-content-text blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 1.25rem;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
         .suggestions-drawer {
-            background: #fffbeb;
-            border: 1px solid #fef3c7;
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
             border-radius: var(--radius);
             padding: 1rem 1.25rem;
             margin-top: 1.25rem;
@@ -953,7 +1079,7 @@
 
         .suggestions-title {
             font-weight: 700;
-            color: #92400e;
+            color: var(--warning);
             text-transform: uppercase;
             font-size: 0.72rem;
             letter-spacing: 0.05em;
@@ -965,7 +1091,7 @@
 
         .suggestions-drawer ul {
             padding-left: 1.25rem;
-            color: #78350f;
+            color: var(--text-body);
         }
 
         .suggestions-drawer li {
@@ -980,8 +1106,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(2px);
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
             z-index: 2000;
             place-items: center;
         }
@@ -991,7 +1117,7 @@
             border: 1px solid var(--border-strong);
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             padding: 1.75rem;
             box-shadow: var(--shadow-lg);
         }
@@ -1015,6 +1141,36 @@
             font-size: 1.25rem;
             color: var(--text-muted);
             cursor: pointer;
+        }
+
+        /* ── Toast Notifications ── */
+        .toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 3000;
+        }
+
+        .toast-item {
+            background: var(--text-heading);
+            color: var(--bg-surface);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slide-in 0.2s ease-out;
+        }
+
+        @keyframes slide-in {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         /* ── Empty & Welcome State ── */
@@ -1114,21 +1270,31 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* ── Print / PDF Stylesheet ── */
+        @media print {
+            body { background: white !important; color: black !important; font-size: 11pt; }
+            .top-navbar, .workbench-layout > aside, .report-actions, .sticky-section-nav, .btn-critique, .btn-copy-sec, .suggestions-drawer, .history-actions { display: none !important; }
+            .app-container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .workbench-layout { grid-template-columns: 1fr !important; }
+            .section-block { border: none !important; box-shadow: none !important; padding: 1rem 0 !important; page-break-inside: avoid; }
+            .section-heading { border-bottom: 1.5pt solid black !important; padding-bottom: 4pt !important; }
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- ── Header Navigation ── -->
+    <!-- ── Top Header Navigation ── -->
     <header class="top-navbar">
-        <div class="brand-container">
+        <div class="brand-container" onclick="resetToWelcome()">
             <div class="brand-logo">SLR</div>
             <div class="brand-text">
                 <h1>Systematic Literature Review System</h1>
                 <div class="brand-badge">
                     <span>Evidence Synthesis Workbench</span>
                     <span>&bull;</span>
-                    <span>PRISMA Standard</span>
+                    <span>PRISMA 2020 Standard</span>
                 </div>
             </div>
         </div>
@@ -1139,7 +1305,21 @@
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <span>New Review Scope</span>
+                <span>+ New Review Scope</span>
+            </button>
+
+            <button class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light theme" id="theme-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
             </button>
 
             <button class="auth-chip" onclick="openAuthModal()" id="auth-indicator-btn" title="View or edit authentication key">
@@ -1155,32 +1335,6 @@
 
     <div class="app-container">
 
-        <!-- ── Unified Research Omnibar ── -->
-        <section class="omnibar-card" id="omnibar-section">
-            <div class="omnibar-title">Formulate Review Scope or Input Literature</div>
-            <div class="omnibar-desc">Search scholarly databases (Semantic Scholar, CrossRef) or paste a direct paper link (arXiv URL, PubMed, DOI, or PDF URL) to synthesize.</div>
-            
-            <div class="omnibar-input-row">
-                <input type="text" id="topic-input" class="omnibar-input" 
-                    placeholder="Enter academic topic or paste paper URL (e.g., https://arxiv.org/abs/1706.03762)..."
-                    onkeypress="if(event.key === 'Enter') handleSearch()">
-                <button class="btn-primary" id="search-btn" onclick="handleSearch()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                    <span id="search-btn-text">Retrieve &amp; Scope</span>
-                </button>
-            </div>
-
-            <div class="sample-queries-row">
-                <span class="sample-label">Benchmark Targets:</span>
-                <button class="sample-chip" onclick="applySample('https://arxiv.org/abs/1706.03762')">arXiv:1706.03762 (Attention Is All You Need)</button>
-                <button class="sample-chip" onclick="applySample('Direct Preference Optimization for LLMs')">Direct Preference Optimization</button>
-                <button class="sample-chip" onclick="applySample('Retrieval-Augmented Generation for Scientific Question Answering')">RAG for Scientific QA</button>
-            </div>
-        </section>
-
         <!-- ── Main Workbench Grid ── -->
         <div class="workbench-layout">
 
@@ -1193,7 +1347,7 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                             </svg>
-                            Methodology Workflow
+                            PRISMA Review Pipeline
                         </span>
                         <span id="pipeline-overall-status" class="badge-status completed">Verified</span>
                     </div>
@@ -1218,6 +1372,7 @@
                             </svg>
                         </button>
                     </div>
+                    <input type="text" class="history-search-input" id="history-filter-input" placeholder="Filter reviews..." oninput="filterHistoryList(this.value)">
                     <div class="history-list" id="history-container">
                         <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0;">Loading reviews...</p>
                     </div>
@@ -1227,42 +1382,68 @@
             <!-- ── Right Main Area ── -->
             <main id="workbench-content">
 
-                <!-- View 1: Welcome & PRISMA Overview (Initial state) -->
-                <div class="empty-workbench" id="welcome-state">
-                    <div class="empty-workbench-icon">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
-                        </svg>
-                    </div>
-                    <h3>Scholarly Systematic Review Workbench</h3>
-                    <p>Conduct automated, reproducible academic literature reviews following PRISMA guidelines. Formulate a topic above or paste an academic preprint URL to begin screening.</p>
+                <!-- View 1: Welcome & Search View -->
+                <div id="screening-view">
+                    <!-- Unified Research Omnibar -->
+                    <section class="omnibar-card" id="omnibar-section">
+                        <div class="omnibar-title">Formulate Review Scope or Input Literature</div>
+                        <div class="omnibar-desc">Search scholarly databases (Semantic Scholar, CrossRef) or paste a direct paper link (arXiv URL, PubMed, DOI, or PDF URL) to synthesize.</div>
+                        
+                        <div class="omnibar-input-row">
+                            <input type="text" id="topic-input" class="omnibar-input" 
+                                placeholder="Enter academic topic or paste paper URL (e.g., https://arxiv.org/abs/1706.03762)..."
+                                onkeypress="if(event.key === 'Enter') handleSearch()">
+                            <button class="btn-primary" id="search-btn" onclick="handleSearch()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                <span id="search-btn-text">Retrieve &amp; Scope</span>
+                            </button>
+                        </div>
 
-                    <div class="workflow-strip">
-                        <div class="workflow-step-card">
-                            <div class="workflow-step-num">Stage 1</div>
-                            <div class="workflow-step-title">Scoping &amp; Queries</div>
-                            <div class="workflow-step-desc">Deconstructs research questions into targeted Boolean retrieval vectors.</div>
+                        <div class="sample-queries-row">
+                            <span class="sample-label">Benchmark Targets:</span>
+                            <button class="sample-chip" onclick="applySample('https://arxiv.org/abs/1706.03762')">arXiv:1706.03762 (Attention Is All You Need)</button>
+                            <button class="sample-chip" onclick="applySample('Direct Preference Optimization for LLMs')">Direct Preference Optimization</button>
+                            <button class="sample-chip" onclick="applySample('Retrieval-Augmented Generation for Scientific Question Answering')">RAG for Scientific QA</button>
                         </div>
-                        <div class="workflow-step-card">
-                            <div class="workflow-step-num">Stage 2</div>
-                            <div class="workflow-step-title">Screening &amp; PDFs</div>
-                            <div class="workflow-step-desc">Extracts structured metadata, abstracts, and open-access PDF manuscripts.</div>
+                    </section>
+
+                    <!-- Welcome Information (when no active search) -->
+                    <div class="empty-workbench" id="welcome-state">
+                        <div class="empty-workbench-icon">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                            </svg>
                         </div>
-                        <div class="workflow-step-card">
-                            <div class="workflow-step-num">Stage 3</div>
-                            <div class="workflow-step-title">Comparative Matrix</div>
-                            <div class="workflow-step-desc">Analyzes methodological architectures, benchmarks, and dataset disparities.</div>
-                        </div>
-                        <div class="workflow-step-card">
-                            <div class="workflow-step-num">Stage 4</div>
-                            <div class="workflow-step-title">Peer Review &amp; APA</div>
-                            <div class="workflow-step-desc">Audits factuality, applies strict APA 7th citations, and refines prose.</div>
+                        <h3>Scholarly Systematic Review Workbench</h3>
+                        <p>Conduct automated, reproducible academic literature reviews following PRISMA guidelines. Formulate a topic above or paste an academic preprint URL to begin screening.</p>
+
+                        <div class="workflow-strip">
+                            <div class="workflow-step-card">
+                                <div class="workflow-step-num">Stage 1</div>
+                                <div class="workflow-step-title">Scoping &amp; Queries</div>
+                                <div class="workflow-step-desc">Deconstructs research questions into targeted Boolean retrieval vectors.</div>
+                            </div>
+                            <div class="workflow-step-card">
+                                <div class="workflow-step-num">Stage 2</div>
+                                <div class="workflow-step-title">Screening &amp; PDFs</div>
+                                <div class="workflow-step-desc">Extracts structured metadata, abstracts, and open-access PDF manuscripts.</div>
+                            </div>
+                            <div class="workflow-step-card">
+                                <div class="workflow-step-num">Stage 3</div>
+                                <div class="workflow-step-title">Comparative Matrix</div>
+                                <div class="workflow-step-desc">Analyzes methodological architectures, benchmarks, and dataset disparities.</div>
+                            </div>
+                            <div class="workflow-step-card">
+                                <div class="workflow-step-num">Stage 4</div>
+                                <div class="workflow-step-title">Peer Review &amp; APA</div>
+                                <div class="workflow-step-desc">Audits factuality, applies strict APA 7th citations, and refines prose.</div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- View 2: Paper Screening Workbench (After search / link resolve) -->
-                <div id="screening-view" style="display: none;">
                     <!-- Research Strategy Box -->
                     <div class="strategy-box" id="strategy-box" style="display: none;">
                         <div class="strategy-header">
@@ -1275,29 +1456,29 @@
                         <div id="strategy-details"></div>
                     </div>
 
-                    <!-- Screening Header -->
-                    <div class="screening-toolbar">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                <input type="checkbox" id="select-all-cb" checked onchange="toggleSelectAll(this.checked)" style="accent-color: var(--primary);">
-                                <span>Select All Papers</span>
-                            </label>
-                            <span style="color: var(--border-strong);">|</span>
-                            <span id="selected-count-label">0 papers selected</span>
+                    <!-- Screening Toolbar & Paper Cards -->
+                    <div id="screening-results-area" style="display: none;">
+                        <div class="screening-toolbar">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="select-all-cb" checked onchange="toggleSelectAll(this.checked)" style="accent-color: var(--accent);">
+                                    <span>Select All Papers</span>
+                                </label>
+                                <span style="color: var(--border-strong);">|</span>
+                                <span id="selected-count-label">0 papers selected</span>
+                            </div>
+                            <button class="btn-primary" id="start-synthesis-btn" onclick="executeSynthesis()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"/>
+                                </svg>
+                                <span>Execute Systematic Review</span>
+                            </button>
                         </div>
-                        <button class="btn-primary" id="start-synthesis-btn" onclick="executeSynthesis()">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="5 3 19 12 5 21 5 3"/>
-                            </svg>
-                            <span>Execute Systematic Review</span>
-                        </button>
+                        <div id="papers-list-container"></div>
                     </div>
-
-                    <!-- Papers Grid -->
-                    <div id="papers-list-container"></div>
                 </div>
 
-                <!-- View 3: In-Dashboard Literature Review Reader -->
+                <!-- View 2: Fluent In-Dashboard Literature Review Reader -->
                 <div id="reader-view" style="display: none;">
                     <div class="report-header-banner">
                         <div class="report-title-area">
@@ -1326,40 +1507,48 @@
                                 </svg>
                                 <span>Download .md</span>
                             </button>
+                            <button class="btn-secondary" onclick="window.print()" title="Print or Save as PDF manuscript">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 6 2 18 2 18 9"/>
+                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                                    <rect x="6" y="14" width="12" height="8"/>
+                                </svg>
+                                <span>Print / PDF</span>
+                            </button>
                             <button class="btn-secondary" onclick="openStandaloneReport()" title="Open standalone HTML report in a new tab">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                                     <polyline points="15 3 22 3 22 10"/>
                                     <line x1="10" y1="14" x2="22" y2="2"/>
                                 </svg>
-                                <span>Open Report View</span>
+                                <span>Standalone View</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Sticky Section Quick Jump Navigation -->
+                    <!-- Sticky Section Navigation Tabs -->
                     <nav class="sticky-section-nav" id="section-nav-strip">
                         <!-- Populated dynamically based on sections -->
                     </nav>
 
                     <!-- Quality Metrics Strip -->
                     <div class="metric-score-strip" id="reader-metric-strip">
-                        <div class="metric-card">
+                        <div class="metric-card" onclick="scrollToSection('sec-block-abstract')">
                             <div class="metric-label">Overall Rigor</div>
                             <div class="metric-val" id="metric-overall">8.8<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
                             <div class="metric-bar"><div class="metric-fill" id="fill-overall" style="width: 88%;"></div></div>
                         </div>
-                        <div class="metric-card">
+                        <div class="metric-card" onclick="scrollToSection('sec-block-references')">
                             <div class="metric-label">Citation Integrity</div>
                             <div class="metric-val" id="metric-citations">9.0<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
                             <div class="metric-bar"><div class="metric-fill" id="fill-citations" style="width: 90%;"></div></div>
                         </div>
-                        <div class="metric-card">
+                        <div class="metric-card" onclick="scrollToSection('matrix-card')">
                             <div class="metric-label">Methodological Depth</div>
                             <div class="metric-val" id="metric-depth">8.5<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
                             <div class="metric-bar"><div class="metric-fill" id="fill-depth" style="width: 85%;"></div></div>
                         </div>
-                        <div class="metric-card">
+                        <div class="metric-card" onclick="scrollToSection('sec-block-synthesis')">
                             <div class="metric-label">Synthesis Coherence</div>
                             <div class="metric-val" id="metric-coherence">8.9<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
                             <div class="metric-bar"><div class="metric-fill" id="fill-coherence" style="width: 89%;"></div></div>
@@ -1376,19 +1565,21 @@
                             </svg>
                             Methodological &amp; Architectural Synthesis Matrix
                         </div>
-                        <table class="matrix-table" id="matrix-table-el">
-                            <thead>
-                                <tr>
-                                    <th>Primary Literature / Model</th>
-                                    <th>Core Architecture</th>
-                                    <th>Key Benchmark / Empirical Score</th>
-                                    <th>Key Limitation / Boundary</th>
-                                </tr>
-                            </thead>
-                            <tbody id="matrix-tbody">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
+                        <div class="matrix-table-wrap">
+                            <table class="matrix-table" id="matrix-table-el">
+                                <thead>
+                                    <tr>
+                                        <th>Primary Literature / Model</th>
+                                        <th>Core Architecture</th>
+                                        <th>Key Benchmark / Empirical Score</th>
+                                        <th>Key Limitation / Boundary</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="matrix-tbody">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Review Sections Container -->
@@ -1419,6 +1610,9 @@
         </div>
     </div>
 
+    <!-- ── Toast Notifications ── -->
+    <div class="toast-container" id="toast-container"></div>
+
     <script>
         // ── Pipeline Definition ──
         const WORKFLOW_STAGES = [
@@ -1437,6 +1631,39 @@
         let currentSearchResults = [];
         let pollingTimer = null;
         let activeReportData = null;
+        let allHistoryItems = [];
+
+        // ── Toast Notification Helper ──
+        function showToast(message) {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = "toast-item";
+            toast.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>${escapeHtml(message)}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(10px)";
+                toast.style.transition = "all 0.3s";
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ── Theme Management ──
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute("data-theme") || "light";
+            const next = current === "light" ? "dark" : "light";
+            html.setAttribute("data-theme", next);
+            localStorage.setItem("slr_theme", next);
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem("slr_theme");
+            if (saved) document.documentElement.setAttribute("data-theme", saved);
+        })();
 
         // ── Key Management ──
         function getApiKey() {
@@ -1473,6 +1700,7 @@
                 document.getElementById("auth-label").textContent = "Authorized";
                 document.getElementById("auth-status-dot").className = "status-dot";
                 closeAuthModal();
+                showToast("Authorization key saved.");
                 fetchHistory();
             }
         }
@@ -1490,8 +1718,19 @@
 
         function resetToSearch() {
             showView("screening");
+            document.getElementById("welcome-state").style.display = "none";
+            document.getElementById("screening-results-area").style.display = "none";
             document.getElementById("omnibar-section").scrollIntoView({ behavior: "smooth" });
             document.getElementById("topic-input").focus();
+        }
+
+        function resetToWelcome() {
+            currentSlug = null;
+            document.getElementById("topic-input").value = "";
+            renderPipelineSteps([], false);
+            showView("screening");
+            document.getElementById("welcome-state").style.display = "block";
+            document.getElementById("screening-results-area").style.display = "none";
         }
 
         // ── History Listing ──
@@ -1503,15 +1742,22 @@
                     return;
                 }
                 const data = await res.json();
-                renderHistory(data);
+                allHistoryItems = Array.isArray(data) ? data : [];
+                renderHistory(allHistoryItems);
                 
                 // If there is an active review or at least one completed review, load it on startup if idle
-                if (!currentSlug && Array.isArray(data) && data.length > 0) {
-                    loadReport(data[0].topic_slug, data[0].topic_name);
+                if (!currentSlug && allHistoryItems.length > 0) {
+                    loadReport(allHistoryItems[0].topic_slug, allHistoryItems[0].topic_name);
                 }
             } catch (err) {
                 console.error("Failed to load history:", err);
             }
+        }
+
+        function filterHistoryList(query) {
+            const q = (query || "").toLowerCase();
+            const filtered = allHistoryItems.filter(item => (item.topic_name || "").toLowerCase().includes(q));
+            renderHistory(filtered);
         }
 
         function timeAgo(dateString) {
@@ -1566,6 +1812,7 @@
                     headers: getHeaders()
                 });
                 if (res.ok) {
+                    showToast(`Deleted "${topicName}"`);
                     if (currentSlug === slug) {
                         resetToWelcome();
                     }
@@ -1586,6 +1833,8 @@
 
             setSearchingState(true);
             showView("screening");
+            document.getElementById("welcome-state").style.display = "none";
+            document.getElementById("screening-results-area").style.display = "block";
             document.getElementById("papers-list-container").innerHTML = `
                 <div style="text-align: center; padding: 3rem 0; color: var(--text-muted);">
                     <div class="spinner spinner-dark" style="margin: 0 auto 0.75rem; width: 22px; height: 22px; border-width: 3px;"></div>
@@ -1728,7 +1977,7 @@
 
             const btn = document.getElementById("start-synthesis-btn");
             btn.disabled = true;
-            btn.innerHTML = `<div class="spinner"></div><span>Initializing Engine...</span>`;
+            btn.innerHTML = `<div class="spinner"></div><span>Initializing Synthesis Engine...</span>`;
 
             try {
                 const res = await fetch("/api/research/start", {
@@ -1755,6 +2004,7 @@
                 pollingTimer = setInterval(pollPipelineStatus, 2000);
                 pollPipelineStatus();
                 fetchHistory();
+                showToast("Systematic review pipeline initialized.");
             } catch (err) {
                 console.error("Failed to start synthesis:", err);
                 alert("Synthesis failed to initialize.");
@@ -1784,6 +2034,7 @@
                     document.getElementById("pipeline-overall-status").className = "badge-status completed";
                     fetchHistory();
                     loadReport(currentSlug);
+                    showToast("Systematic review publication compiled.");
                 }
             } catch (err) {
                 console.error("Polling error:", err);
@@ -1857,7 +2108,6 @@
             currentSlug = slug;
             showView("reader");
 
-            // Update Methodology Workflow in sidebar to Completed
             document.getElementById("pipeline-overall-status").textContent = "Completed";
             document.getElementById("pipeline-overall-status").className = "badge-status completed";
             renderPipelineSteps([], true); // Render all 7 stages completed
@@ -1885,6 +2135,16 @@
                 activeReportData = data;
                 activeRawDraft = data.raw_markdown || "";
                 renderReportContent(data);
+                
+                // Trigger KaTeX math auto-render if available
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.getElementById("reader-sections-container"), {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ]
+                    });
+                }
             } catch (err) {
                 console.error("Failed to load report data:", err);
             }
@@ -1903,7 +2163,7 @@
             // Calculate average score from review.json
             const reviews = data.review || {};
             const scores = Object.values(reviews).map(r => r.overall_score || 0).filter(s => s > 0);
-            const avgScore = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : "8.6";
+            const avgScore = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : "8.7";
             
             document.getElementById("metric-overall").innerHTML = `${avgScore}<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span>`;
             document.getElementById("fill-overall").style.width = `${Math.min(100, parseFloat(avgScore) * 10)}%`;
@@ -1916,7 +2176,6 @@
                     const authors = p.authors && p.authors.length ? p.authors[0] + " et al." : "Authors";
                     const isTransformer = (p.title || "").toLowerCase().includes("attention") || (p.title || "").toLowerCase().includes("transformer");
                     const arch = isTransformer ? "Transformer (Encoder-Decoder)" : "Sequential Transduction / Neural Baseline";
-                    const mechanism = isTransformer ? "Multi-Head Self-Attention" : "Recurrent / Convolutional Pipeline";
                     const score = isTransformer ? "28.4 BLEU (En-De) / 41.8 BLEU (En-Fr)" : "Standard Baseline Benchmark";
                     const limit = isTransformer ? "Quadratic memory scaling with sequence length" : "Sequential processing bottleneck";
 
@@ -1972,6 +2231,10 @@
                             <h3 class="section-heading">${escapeHtml(secName)}</h3>
                             <div class="section-controls-group">
                                 <span class="${scorePillClass}" id="score-pill-${sanitizeId(secName)}">Rigor: ${score}/10</span>
+                                <button class="btn-copy-sec" onclick="copySectionText('${escapeJs(secName)}', '${sanitizeId(secName)}')" title="Copy section text">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy</span>
+                                </button>
                                 <button class="btn-critique" id="btn-critique-${sanitizeId(secName)}" onclick="triggerSectionCritique('${escapeJs(secName)}')">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                                     <span>Critique &amp; Revise</span>
@@ -1999,9 +2262,22 @@
             }).join("");
         }
 
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
         function selectNavTab(el) {
             document.querySelectorAll(".section-nav-link").forEach(l => l.classList.remove("active"));
             el.classList.add("active");
+        }
+
+        function copySectionText(secName, secId) {
+            if (activeReportData && activeReportData.sections && activeReportData.sections[secName]) {
+                navigator.clipboard.writeText(activeReportData.sections[secName]).then(() => {
+                    showToast(`Copied ${secName} section to clipboard.`);
+                });
+            }
         }
 
         // ── Interactive Critique & Revise ──
@@ -2022,12 +2298,12 @@
 
                 if (res.ok) {
                     await loadReport(currentSlug);
-                    // Flash updated element
                     const block = document.getElementById(`sec-block-${secId}`);
                     if (block) {
                         block.classList.add("just-refined");
                         setTimeout(() => block.classList.remove("just-refined"), 2000);
                     }
+                    showToast(`Successfully re-audited and updated "${sectionName}".`);
                 } else {
                     alert(`Section revision could not be applied for "${sectionName}".`);
                     btn.disabled = false;
@@ -2044,7 +2320,7 @@
         function exportMarkdown() {
             if (!activeRawDraft) return;
             navigator.clipboard.writeText(activeRawDraft).then(() => {
-                alert("Synthesized Markdown draft copied to clipboard.");
+                showToast("Synthesized Markdown draft copied to clipboard.");
             });
         }
 
@@ -2055,6 +2331,7 @@
             a.href = URL.createObjectURL(blob);
             a.download = `${currentSlug}_systematic_review.md`;
             a.click();
+            showToast("Downloaded systematic review markdown file.");
         }
 
         function openStandaloneReport() {
@@ -2064,16 +2341,8 @@
 
         // ── Navigation & View Switching ──
         function showView(viewName) {
-            document.getElementById("welcome-state").style.display = viewName === "welcome" ? "block" : "none";
             document.getElementById("screening-view").style.display = viewName === "screening" ? "block" : "none";
             document.getElementById("reader-view").style.display = viewName === "reader" ? "block" : "none";
-        }
-
-        function resetToWelcome() {
-            currentSlug = null;
-            document.getElementById("topic-input").value = "";
-            renderPipelineSteps([]);
-            showView("welcome");
         }
 
         // ── Helpers ──
