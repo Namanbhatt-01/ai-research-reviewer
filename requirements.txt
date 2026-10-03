@@ -12,5 +12,4 @@ python-dotenv>=1.0.0
 
 # Web Interfaces & Visualization
 flask>=3.0.0
-gradio>=5.0.0
 markdown2>=2.4.0

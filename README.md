@@ -3,7 +3,6 @@
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-FF4F00?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph)
 [![PyMuPDF4LLM](https://img.shields.io/badge/Parser-PyMuPDF4LLM-0288D1)](https://pymupdf.readthedocs.io/)
-[![Gradio](https://img.shields.io/badge/UI-Gradio-FF7C00?logo=gradio&logoColor=white)](https://gradio.app/)
 [![Infosys Springboard](https://img.shields.io/badge/Program-Infosys%20Springboard-007CC3)](https://infyspringboard.onwingspan.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -24,8 +23,7 @@ An autonomous, multi-agent AI system designed to conduct systematic literature r
 - [Usage Modes](#-usage-modes)
   - [1. Autonomous CLI Execution](#1-autonomous-cli-execution)
   - [2. Interactive Modern Web Dashboard](#2-interactive-modern-web-dashboard)
-  - [3. Milestone 4 Gradio Interface](#3-milestone-4-gradio-interface)
-  - [4. Graph Visualization & Export](#4-graph-visualization--export)
+  - [3. Graph Visualization & Export](#3-graph-visualization--export)
 - [Project Structure](#-project-structure)
 - [Quality Scoring & Peer-Review Heuristics](#-quality-scoring--peer-review-heuristics)
 - [License & Acknowledgments](#-license--acknowledgments)
@@ -128,7 +126,7 @@ graph TD;
 - **Orchestration:** `langgraph`, `langchain-core`
 - **PDF Extraction:** `pymupdf4llm`
 - **LLM Engine:** OpenAI API / OpenRouter (`gpt-4o-mini`, `gpt-4o`, etc.)
-- **User Interfaces:** `gradio` and `flask`
+- **User Interface:** Full-Stack Modern Web Application (`flask`, vanilla CSS/JS)
 - **State & Storage:** SQLite (`data/state.db`) + local file artifacts
 
 ---
@@ -190,21 +188,11 @@ Launch the polished web dashboard:
 python main.py ui --port 5001
 ```
 Open `http://localhost:5001` in your browser. Enter `APP_API_KEY` (configured in `.env`) to access:
-- Live paper search and interactive paper selection.
-- Real-time pipeline execution progress.
-- Embedded report viewer.
+- Live paper search and interactive paper screening.
+- Real-time pipeline execution progress timeline.
+- Embedded literature review reader with KaTeX formulas, section refinement, and publication exports.
 
-### 3. Milestone 4 Gradio Interface
-Launch the Gradio interface:
-```bash
-python main.py gradio --port 7860
-```
-Open `http://localhost:7860` in your browser:
-- Input research topics and adjust paper count.
-- View real-time tabs: **Draft**, **Quality Scores**, **Cross-Paper Comparison**, **Selected Literature**, and **Strategy**.
-- Click **"Critique / Revise Draft"** to trigger interactive refinement on demand!
-
-### 4. Graph Visualization & Export
+### 3. Graph Visualization & Export
 Display the architecture diagram and export it to PNG/Mermaid:
 ```bash
 python main.py graph --export docs/architecture_graph.png
@@ -235,9 +223,6 @@ python main.py graph --export docs/architecture_graph.png
 │   │   ├── drafting.py         # 6-section academic drafting
 │   │   ├── references.py       # APA 7th bibliography generator
 │   │   └── reviewer.py         # AI peer-review & heuristic scoring
-│   │
-│   ├── ui/                     # Gradio interface (Milestone 4)
-│   │   └── gradio_app.py       # Interactive Gradio application
 │   │
 │   ├── api/                    # Web Application & REST API
 │   │   ├── app.py              # Flask server & background runners

@@ -1,6 +1,6 @@
 import pytest
 from src.api.app import app
-from src.ui.gradio_app import on_critique_revise
+from src.core.reviewer import DraftReviewer
 from src.config import config
 
 
@@ -29,22 +29,17 @@ def test_flask_history_endpoint(client):
     assert isinstance(data, list)
 
 
-def test_gradio_critique_revise_function():
-    """Verify on_critique_revise interactive function in Gradio app."""
-    sample_draft = (
-        "# Literature Review\n\n"
-        "## Abstract\n"
-        "This paper explores neural architectures and transformers in sequence transduction.\n\n"
-        "## Methods\n"
-        "We evaluate self-attention against recurrence.\n\n"
-        "## Results\n"
-        "Demonstrated 28.4 BLEU score on WMT benchmark.\n\n"
-        "## Conclusion\n"
-        "Transformers represent a promising foundation for sequence tasks.\n"
+def test_reviewer_heuristic_evaluation():
+    """Verify DraftReviewer heuristic evaluation calculates structured quality scores."""
+    reviewer = DraftReviewer()
+    sample_text = (
+        "This systematic review analyzes recent progress in transformer architectures "
+        "and self-attention mechanisms in sequence transduction. Empirical results across "
+        "multiple benchmarks demonstrate significant improvements over recurrent models."
     )
-    
-    critique_output, revised_draft = on_critique_revise(sample_draft)
-    assert "Overall Revision Score:" in critique_output
-    assert revised_draft is not None
-    assert "## Abstract" in revised_draft
-    assert "## Methods" in revised_draft
+    evaluation = reviewer.evaluate_section("Abstract", sample_text)
+    assert "overall" in evaluation
+    assert 0 <= evaluation["overall"] <= 10
+    assert "clarity" in evaluation
+    assert "academic_rigor" in evaluation
+

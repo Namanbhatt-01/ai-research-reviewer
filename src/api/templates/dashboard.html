@@ -1515,14 +1515,6 @@
                                 </svg>
                                 <span>Print / PDF</span>
                             </button>
-                            <button class="btn-secondary" onclick="openStandaloneReport()" title="Open standalone HTML report in a new tab">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                    <polyline points="15 3 22 3 22 10"/>
-                                    <line x1="10" y1="14" x2="22" y2="2"/>
-                                </svg>
-                                <span>Standalone View</span>
-                            </button>
                         </div>
                     </div>
 
@@ -1792,9 +1784,6 @@
                             <span>${timeAgo(w.created_at)}</span>
                         </div>
                         <div class="history-actions">
-                            <button class="btn-icon" onclick="event.stopPropagation(); window.open('/report/${w.topic_slug}?api_key=' + encodeURIComponent(getApiKey()), '_blank')" title="Open Standalone Report">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 22 3 22 10"/><line x1="10" y1="14" x2="22" y2="2"/></svg>
-                            </button>
                             <button class="btn-icon delete" onclick="event.stopPropagation(); deleteReview('${w.topic_slug}', '${escapeHtml(w.topic_name)}')" title="Delete from Archive">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                             </button>
@@ -2334,11 +2323,6 @@
             showToast("Downloaded systematic review markdown file.");
         }
 
-        function openStandaloneReport() {
-            if (!currentSlug) return;
-            window.open(`/report/${currentSlug}?api_key=${encodeURIComponent(getApiKey())}`, '_blank');
-        }
-
         // ── Navigation & View Switching ──
         function showView(viewName) {
             document.getElementById("screening-view").style.display = viewName === "screening" ? "block" : "none";
@@ -2364,6 +2348,12 @@
 
         // ── Startup ──
         window.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialReview = urlParams.get("review");
+            if (initialReview) {
+                currentSlug = initialReview;
+                loadReport(initialReview);
+            }
             fetchHistory();
         });
     </script>

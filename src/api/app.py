@@ -2,7 +2,7 @@ import os
 import json
 import threading
 from typing import Optional, List, Dict
-from flask import Flask, send_file, request, jsonify, abort, render_template_string
+from flask import Flask, send_file, request, jsonify, abort, render_template_string, redirect
 
 from src.config import config
 from src.core.reviewer import DraftReviewer
@@ -298,29 +298,13 @@ def get_report_data(topic_slug: str):
 @app.route("/report/<topic>")
 @require_api_key
 def view_report(topic: str):
-    """Dynamically renders the research report from data files."""
+    """Redirects legacy/direct report URLs to the unified workbench reader."""
     topic_slug = sanitize_slug(topic)
-    topic_dir = os.path.abspath(os.path.join(config.DRAFTS_DIR, topic_slug))
-    
-    # Locate data files
-    refined_draft = os.path.join(topic_dir, "refined_draft.md")
-    source_draft = refined_draft if os.path.exists(refined_draft) else os.path.join(topic_dir, "draft.md")
-    review_json_path = os.path.join(topic_dir, "review.json")
-    
-    if not os.path.exists(source_draft):
-        abort(404, description=f"Research data for '{topic_slug}' not found.")
-    
-    # Dynamically render HTML
-    html = generator.render_html(
-        draft_path=source_draft,
-        review_path=review_json_path if os.path.exists(review_json_path) else None,
-        topic_slug=topic_slug
-    )
-    
-    if not html:
-        abort(500, description="Failed to render report.")
-        
-    return html
+    api_key = request.args.get("api_key") or request.headers.get("X-API-Key") or ""
+    query = f"?review={topic_slug}"
+    if api_key:
+        query += f"&api_key={api_key}"
+    return redirect(f"/{query}")
 
 
 @app.route("/api/revise/<topic>", methods=["POST"])

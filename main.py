@@ -309,11 +309,6 @@ def main():
     parser_ui = subparsers.add_parser("ui", help="Start the interactive modern Web Dashboard")
     parser_ui.add_argument("--port", type=int, default=5001, help="Server port (default: 5001)")
 
-    # gradio command (Gradio UI for Milestone 4)
-    parser_gradio = subparsers.add_parser("gradio", help="Start the Milestone 4 Gradio interface")
-    parser_gradio.add_argument("--port", type=int, default=7860, help="Gradio port (default: 7860)")
-    parser_gradio.add_argument("--share", action="store_true", help="Create public shareable link")
-
     # graph command (Display & Export Architecture Diagram)
     parser_graph = subparsers.add_parser("graph", help="Visualize and export the LangGraph state architecture")
     parser_graph.add_argument("--export", type=str, default="docs/architecture_graph.png", help="Export path for diagram PNG")
@@ -322,11 +317,6 @@ def main():
 
     if args.command == "ui":
         start_server(port=args.port)
-        return
-
-    if args.command == "gradio":
-        from src.ui.gradio_app import launch_gradio
-        launch_gradio(port=args.port, share=getattr(args, "share", False))
         return
 
     if args.command == "graph":
@@ -360,8 +350,7 @@ def main():
             print(f"\nResearch Workflow Complete!")
             if report_path:
                 print(f"HTML Report generated at: {report_path}")
-            print(f"Launch Web Dashboard: python main.py ui")
-            print(f"Launch Gradio UI:     python main.py gradio\n")
+            print(f"Launch Web Dashboard: python main.py ui\n")
             return
         else:
             orch = PipelineOrchestrator(topic_str, limit=args.limit)
