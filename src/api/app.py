@@ -93,10 +93,22 @@ def search_papers():
     from src.core.retrieval import PaperRetriever
     retriever = PaperRetriever()
     try:
+        clean_topic = topic.strip()
+        # Direct Paper Link or arXiv ID check
+        if clean_topic.startswith(("http://", "https://", "arxiv:")) or "arxiv.org" in clean_topic or "semanticscholar.org" in clean_topic:
+            resolved = retriever.resolve_paper_from_url(clean_topic)
+            if resolved:
+                return jsonify({
+                    "papers": [resolved.to_dict()],
+                    "cached": False,
+                    "is_direct_url": True
+                })
+
         papers, was_cached = retriever.search_papers(topic, limit=limit, bypass_cache=bypass_cache)
         return jsonify({
             "papers": [p.to_dict() for p in papers],
-            "cached": was_cached
+            "cached": was_cached,
+            "is_direct_url": False
         })
     except Exception as e:
         logger.error(f"Search API failed: {e}")
@@ -228,6 +240,58 @@ def process_research(topic_slug: str):
     logger.info(f"[API] Starting full processing for '{topic_slug}'")
     threading.Thread(target=background_processing, args=(topic_slug,)).start()
     return jsonify({"message": "Processing started in background"})
+
+
+@app.route("/api/research/<topic_slug>/report_data", methods=["GET"])
+@require_api_key
+def get_report_data(topic_slug: str):
+    """Returns structured sections, review evaluations, and papers for in-dashboard reading."""
+    topic_slug = sanitize_slug(topic_slug)
+    topic_dir = os.path.abspath(os.path.join(config.DRAFTS_DIR, topic_slug))
+    
+    refined_draft = os.path.join(topic_dir, "refined_draft.md")
+    source_draft = refined_draft if os.path.exists(refined_draft) else os.path.join(topic_dir, "draft.md")
+    
+    if not os.path.exists(source_draft):
+        return jsonify({"error": f"No draft found for '{topic_slug}'"}), 404
+        
+    try:
+        with open(source_draft, "r", encoding="utf-8") as f:
+            raw_markdown = f.read()
+            
+        sections = ReportGenerator._parse_draft(source_draft)
+        sections_html = {k: ReportGenerator._md_to_html(v) for k, v in sections.items()}
+        
+        review_path = os.path.join(topic_dir, "review.json")
+        review_data = {}
+        if os.path.exists(review_path):
+            try:
+                with open(review_path, "r", encoding="utf-8") as f:
+                    review_data = json.load(f)
+            except Exception:
+                pass
+                
+        metadata_file = os.path.join(config.METADATA_DIR, topic_slug, "papers.json")
+        papers_data = []
+        if os.path.exists(metadata_file):
+            try:
+                with open(metadata_file, "r", encoding="utf-8") as f:
+                    papers_data = json.load(f)
+            except Exception:
+                pass
+
+        return jsonify({
+            "topic_slug": topic_slug,
+            "title": topic_slug.replace("_", " ").title(),
+            "sections": sections,
+            "sections_html": sections_html,
+            "raw_markdown": raw_markdown,
+            "review": review_data,
+            "papers": papers_data
+        })
+    except Exception as e:
+        logger.error(f"Failed to load report data: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 # --- Existing Reporting Endpoints ---

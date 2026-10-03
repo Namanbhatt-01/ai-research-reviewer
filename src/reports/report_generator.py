@@ -115,8 +115,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
   .brand-icon {{ background: var(--accent-glow); padding: 0.5rem; border-radius: 10px; display: flex; }}
   .brand h1 {{ 
     font-size: 1.25rem; font-weight: 800; letter-spacing: -0.025em;
-    background: linear-gradient(to right, var(--primary), #8b5cf6);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    color: #0f172a;
   }}
   .brand .subtitle {{ 
     font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; 
@@ -272,8 +271,8 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary)"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
     </div>
     <div>
-      <h1>AI Research Platform</h1>
-      <div class="subtitle">Academic Synthesis &bull; {subtitle}</div>
+      <h1>Systematic Review & Evidence Synthesis</h1>
+      <div class="subtitle">Academic Literature Synthesis &bull; {subtitle}</div>
     </div>
   </div>
   <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">{date}</div>
@@ -300,7 +299,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
   </main>
 </div>
 
-<footer>&copy; AI Research Platform &bull; Professional Insight Report &bull; {date}</footer>
+<footer>&copy; Systematic Literature Review System &bull; PRISMA-Aligned Academic Evidence Synthesis &bull; {date}</footer>
 
 <script>
   // Section Auto-Scroll & TOC Generation
@@ -349,7 +348,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
       const extras = btn.closest('.section-card').querySelector('.section-extras');
       const isOpen = extras.classList.toggle('open');
       btn.classList.toggle('active', isOpen);
-      btn.title = isOpen ? 'Hide AI Options' : 'Show AI Options';
+      btn.title = isOpen ? 'Hide Editorial Notes' : 'Show Editorial Notes';
     }});
   }});
 
@@ -360,12 +359,12 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
       const topic = "{topic_slug}";
       const apiKey = "{api_key}";
       
-      if (!confirm(`Trigger AI revision for the "${{sectionName}}" section? This will take a few seconds.`)) return;
+      if (!confirm(`Request editorial revision for the "${{sectionName}}" section? This will re-evaluate against scholarly standards.`)) return;
       
       btn.disabled = true;
       const label = btn.querySelector('span');
       const originalText = label.textContent;
-      label.textContent = " Refining...";
+      label.textContent = " Revising...";
 
       try {{
         const res = await fetch(`/api/revise/${{topic}}`, {{

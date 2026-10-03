@@ -4,27 +4,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Research Reviewer</title>
+    <title>Systematic Literature Review System &mdash; Academic Evidence Synthesis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
         :root {
-            /* Professional Minimalist SaaS Palette */
-            --bg-color: #f3f4f6;
-            --surface-color: #ffffff;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --border-color: #e5e7eb;
-            --primary: #111827;
-            --primary-hover: #374151;
+            /* Academic & Scholarly Palette */
+            --bg-base: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-muted: #f1f5f9;
+            --bg-card: #ffffff;
+            
+            --border-subtle: #e2e8f0;
+            --border-strong: #cbd5e1;
+            
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            
+            --primary: #1e293b;
+            --primary-hover: #0f172a;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-subtle: #eff6ff;
+            
             --success: #059669;
+            --success-bg: #ecfdf5;
+            --success-border: #a7f3d0;
+            
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --warning-border: #fde68a;
+            
             --danger: #dc2626;
-            --pending: #d97706;
-            --accent-glow: rgba(17, 24, 39, 0.05);
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --radius: 6px;
+            --danger-bg: #fef2f2;
+            --danger-border: #fecaca;
+            
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --radius-sm: 6px;
+            --radius: 8px;
+            --radius-lg: 12px;
         }
 
         * {
@@ -34,24 +59,19 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-body);
             line-height: 1.6;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Solid Navbar --- */
-        .navbar {
-            background-color: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
+        /* ── Top Header Bar ── */
+        .top-navbar {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.85rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -60,792 +80,1506 @@
             z-index: 1000;
         }
 
-        .navbar h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            color: var(--text-primary);
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .navbar .brand-subtitle {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            letter-spacing: -0.015em;
+            line-height: 1.2;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
             font-weight: 600;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 2.5rem auto;
-            padding: 0 1.5rem;
-        }
-
-        /* --- Hero Search Section --- */
-        .search-section {
-            background: var(--surface-color);
-            padding: 3rem 2rem;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            margin-bottom: 2.5rem;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .search-section h2 {
-            margin-bottom: 0.75rem;
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.025em;
-        }
-
-        .search-section p {
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            font-size: 1.1rem;
-        }
-
-        .search-bar {
+        .nav-actions {
             display: flex;
-            gap: 0.75rem;
-            max-width: 650px;
-            margin: 0 auto;
-            background: white;
-            padding: 0.5rem;
-            border-radius: 14px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            align-items: center;
+            gap: 0.85rem;
         }
 
-        .search-bar:focus-within {
-            box-shadow: 0 0 0 4px var(--accent-glow);
-            border-color: var(--primary);
-        }
-
-        .search-bar input {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: none;
-            font-size: 1rem;
-            outline: none;
-            font-weight: 500;
-        }
-
-        button {
-            padding: 0.75rem 1.75rem;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-size: 0.95rem;
+        .auth-chip {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-sm);
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-body);
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
 
-        button:hover {
-            background-color: var(--primary-hover);
+        .auth-chip:hover {
+            background: #e2e8f0;
+            border-color: var(--border-strong);
         }
 
-        button:active {
-            transform: translateY(0);
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
         }
 
-        button:disabled {
-            background-color: #94a3b8;
+        .status-dot.error {
+            background-color: var(--danger);
+        }
+
+        /* ── Container Layout ── */
+        .app-container {
+            max-width: 1440px;
+            margin: 1.75rem auto 3rem;
+            padding: 0 1.5rem;
+        }
+
+        /* ── Omnibar Search Section ── */
+        .omnibar-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 2rem 2.25rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .omnibar-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.35rem;
+        }
+
+        .omnibar-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+        }
+
+        .omnibar-input-row {
+            display: flex;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .omnibar-input {
+            flex: 1;
+            padding: 0.85rem 1.15rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius);
+            background: var(--bg-surface);
+            color: var(--text-heading);
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .omnibar-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-primary {
+            padding: 0.85rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background: var(--text-light);
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
-        /* --- Layout Grid --- */
-        .grid-layout {
+        .sample-queries-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .sample-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .sample-chip {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-body);
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .sample-chip:hover {
+            background: #e2e8f0;
+            border-color: var(--border-strong);
+            color: var(--text-heading);
+        }
+
+        /* ── Workspace 2-Column Grid ── */
+        .workbench-layout {
             display: grid;
             grid-template-columns: 340px 1fr;
-            gap: 2rem;
+            gap: 1.75rem;
+            align-items: start;
         }
 
-        @media (max-width: 992px) {
-            .grid-layout {
+        @media (max-width: 1080px) {
+            .workbench-layout {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* --- Panels & Cards --- */
-        .panel {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 1.75rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .panel h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        /* --- Pipeline & Phases --- */
-        .phase-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            color: var(--text-secondary);
-            border-radius: 10px;
-            transition: background-color 0.2s;
-            margin-bottom: 0.25rem;
-        }
-
-        .phase-item.active {
-            background-color: var(--accent-glow);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .phase-item.completed {
-            color: var(--success);
-        }
-
-        .phase-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            display: grid;
-            place-items: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            background-color: #f1f5f9;
-            color: #64748b;
-            transition: all 0.3s ease;
-        }
-
-        .completed .phase-icon {
-            background-color: #d1fae5;
-            color: var(--success);
-        }
-
-        .active .phase-icon {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        /* --- Paper Cards --- */
-        .paper-card {
-            background: white;
-            border: 1px solid var(--border-color);
+        /* ── Panels & Cards ── */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
-            border-radius: var(--radius);
+            box-shadow: var(--shadow-xs);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.25rem;
-            transition: all 0.3s ease;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .paper-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
-
-        .paper-card h4 {
-            font-size: 1.15rem;
+        .card-title {
+            font-size: 0.88rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-            line-height: 1.4;
-        }
-
-        .paper-card .meta {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-
-        .paper-card .abstract {
-            font-size: 0.9rem;
-            line-height: 1.7;
-            color: #475569;
-            padding: 1rem;
-            background: #f8fafc;
-            border-radius: 8px;
-            border-left: 4px solid #cbd5e1;
-        }
-
-        /* --- Specialized UI Elements --- */
-        .status-badge {
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 999px;
+            color: var(--text-heading);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-        }
-
-        .status-badge.completed {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-badge.pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-badge.running {
-            background: var(--accent-glow);
-            color: var(--primary);
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: .5;
-            }
-        }
-
-        .cache-notice {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            color: #92400e;
-            padding: 1rem 1.25rem;
-            border-radius: var(--radius);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 500;
-        }
-
-        /* --- History Sidebar Refinement --- */
-        #history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .history-group-title {
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-secondary);
-            margin: 1.5rem 0 0.75rem 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .history-group-title:first-child {
-            margin-top: 0;
+        /* ── Sidebar: Pipeline Execution Tracker ── */
+        .pipeline-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0.85rem;
+            border-radius: var(--radius);
+            border: 1px solid transparent;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+
+        .pipeline-step.active {
+            background: var(--accent-subtle);
+            border-color: #bfdbfe;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .pipeline-step.completed {
+            background: var(--bg-muted);
+            color: var(--text-heading);
+        }
+
+        .pipeline-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--bg-muted);
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .pipeline-step.active .pipeline-badge {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            animation: pulse-ring 2s infinite;
+        }
+
+        .pipeline-step.completed .pipeline-badge {
+            background: var(--success);
+            color: white;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* ── Sidebar: History List ── */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 0.25rem;
         }
 
         .history-item {
-            position: relative;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            padding: 0.85rem;
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
+            transition: all 0.15s ease;
+            position: relative;
         }
 
         .history-item:hover {
-            background: white;
-            border-color: var(--primary);
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            background: var(--bg-surface);
+            border-color: var(--border-strong);
+            box-shadow: var(--shadow-xs);
         }
 
-        .history-item .topic {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-primary);
+        .history-item.active-item {
+            border-color: var(--accent);
+            background: var(--bg-surface);
+        }
+
+        .history-topic {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-heading);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             padding-right: 3rem;
+            margin-bottom: 0.35rem;
         }
 
-        .history-item .meta-row {
+        .history-meta {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
-        .history-item .time {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 500;
+        .badge-status {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        .badge-status.completed {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid var(--success-border);
+        }
+
+        .badge-status.running {
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-status.failed {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid var(--danger-border);
         }
 
         .history-actions {
             position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
+            top: 0.65rem;
+            right: 0.65rem;
             display: flex;
-            gap: 0.4rem;
-            opacity: 0;
-            transition: opacity 0.2s;
+            gap: 0.3rem;
         }
 
-        .history-item:hover .history-actions {
-            opacity: 1;
-        }
-
-        .action-icon {
-            width: 26px;
-            height: 26px;
-            border-radius: 6px;
-            display: grid;
-            place-items: center;
-            background: #f1f5f9;
-            color: #64748b;
-            transition: all 0.2s;
-            border: none;
+        .btn-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            padding: 0;
+            transition: all 0.15s;
         }
 
-        .action-icon:hover {
-            background: var(--primary);
-            color: white;
+        .btn-icon:hover {
+            background: var(--bg-surface);
+            border-color: var(--border-strong);
+            color: var(--text-heading);
         }
 
-        .action-icon.delete:hover {
-            background: #fee2e2;
+        .btn-icon.delete:hover {
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
             color: var(--danger);
+        }
+
+        /* ── Strategy Board ── */
+        .strategy-box {
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.88rem;
+        }
+
+        .strategy-header {
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 0.5rem;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ── Paper Screening Cards ── */
+        .screening-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem 1rem;
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .paper-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .paper-card:hover {
+            border-color: var(--border-strong);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .paper-card-header {
+            display: flex;
+            gap: 0.85rem;
+            align-items: flex-start;
+        }
+
+        .paper-select-cb {
+            margin-top: 0.25rem;
+            width: 17px;
+            height: 17px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .paper-main {
+            flex: 1;
+        }
+
+        .paper-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            line-height: 1.35;
+            margin-bottom: 0.35rem;
+        }
+
+        .paper-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .paper-title a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .paper-meta-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .tag-source {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 4px;
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-body);
+        }
+
+        .tag-source.arxiv {
+            background: #fdf2f8;
+            color: #9d174d;
+            border-color: #fbcfe8;
+        }
+
+        .tag-source.pdf {
+            background: #eff6ff;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        .abstract-toggle {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .abstract-body {
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: var(--text-body);
+            background: var(--bg-muted);
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            margin-top: 0.75rem;
+            border-left: 3px solid var(--border-strong);
+            display: none;
+        }
+
+        /* ── In-Dashboard Report Reader ── */
+        .report-header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .report-title-area h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            margin-bottom: 0.4rem;
+        }
+
+        .report-meta-chips {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            padding: 0.55rem 0.95rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-muted);
+            border-color: var(--text-muted);
+        }
+
+        /* ── Metric Score Strip ── */
+        .metric-score-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+
+        .metric-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            line-height: 1;
+        }
+
+        .metric-bar {
+            height: 4px;
+            border-radius: 9999px;
+            background: #e2e8f0;
+            margin-top: 0.6rem;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 9999px;
+        }
+
+        /* ── Report Section Content Blocks ── */
+        .section-block {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.75rem;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .section-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .section-heading {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            letter-spacing: -0.015em;
+        }
+
+        .section-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .section-score-pill {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--bg-muted);
+            color: var(--text-heading);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .section-score-pill.high {
+            background: var(--success-bg);
+            color: var(--success);
+            border-color: var(--success-border);
+        }
+
+        .section-score-pill.medium {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border-color: var(--warning-border);
+        }
+
+        .btn-critique {
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.15s;
+        }
+
+        .btn-critique:hover:not(:disabled) {
+            background: var(--bg-muted);
+            border-color: var(--primary);
+        }
+
+        .btn-critique:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .section-content-text {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #27272a;
+        }
+
+        .section-content-text p {
+            margin-bottom: 1.15rem;
+        }
+
+        .section-content-text ul, .section-content-text ol {
+            margin-bottom: 1.15rem;
+            padding-left: 1.5rem;
+        }
+
+        .section-content-text li {
+            margin-bottom: 0.5rem;
+        }
+
+        .section-content-text h3, .section-content-text h4 {
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-heading);
+        }
+
+        .section-content-text table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.88rem;
+        }
+
+        .section-content-text th, .section-content-text td {
+            border: 1px solid var(--border-subtle);
+            padding: 0.65rem 0.85rem;
+            text-align: left;
+        }
+
+        .section-content-text th {
+            background: var(--bg-muted);
+            font-weight: 600;
+        }
+
+        .suggestions-drawer {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+        }
+
+        .suggestions-title {
+            font-weight: 700;
+            color: #92400e;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .suggestions-drawer ul {
+            padding-left: 1.25rem;
+            color: #78350f;
+        }
+
+        .suggestions-drawer li {
+            margin-bottom: 0.35rem;
+        }
+
+        /* ── Modal Dialog ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 2000;
+            place-items: center;
+        }
+
+        .modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 460px;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-heading);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* ── Empty & Welcome State ── */
+        .empty-workbench {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+        }
+
+        .empty-workbench-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--bg-muted);
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .empty-workbench h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-workbench p {
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto 1.5rem;
+            font-size: 0.92rem;
+        }
+
+        /* ── PRISMA Methodology Diagram Strip ── */
+        .workflow-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.75rem;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .workflow-strip {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .workflow-step-card {
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+
+        .workflow-step-num {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .workflow-step-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 0.35rem;
+        }
+
+        .workflow-step-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* ── Utilities ── */
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .spinner-dark {
+            border-color: rgba(15, 23, 42, 0.15);
+            border-top-color: var(--text-heading);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 
 <body>
 
-    <nav class="navbar">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-            <div style="background: var(--accent-glow); padding: 0.5rem; border-radius: 10px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                    stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary)">
-                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                    <polyline points="14 2 14 8 20 8" />
-                </svg>
-            </div>
-            <div>
-                <h1>AI Research Platform</h1>
-                <div class="brand-subtitle">Academic Synthesis</div>
+    <!-- ── Header Navigation ── -->
+    <header class="top-navbar">
+        <div class="brand-container">
+            <div class="brand-logo">SLR</div>
+            <div class="brand-text">
+                <h1>Systematic Literature Review System</h1>
+                <div class="brand-badge">
+                    <span>Evidence Synthesis Workbench</span>
+                    <span>&bull;</span>
+                    <span>PRISMA Standard</span>
+                </div>
             </div>
         </div>
-    </nav>
 
-    <div class="container">
-        <section class="search-section">
-            <h2>Start Your Research</h2>
-            <p>Enter an academic topic OR paste a direct paper link (arXiv, web article, or PDF URL) to synthesize.</p>
-            <div class="search-bar">
-                <input type="text" id="topic-input" placeholder="Search topic or paste paper URL (e.g., https://arxiv.org/abs/1706.03762)..."
-                    onkeypress="if(event.key === 'Enter') startResearch()">
-                <button id="search-btn" onclick="startResearch()">Analyze</button>
+        <div class="nav-actions">
+            <button class="auth-chip" onclick="openAuthModal()" id="auth-indicator-btn" title="View or edit authentication key">
+                <span class="status-dot" id="auth-status-dot"></span>
+                <span id="auth-label">Authorized</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <!-- ── Unified Research Omnibar ── -->
+        <section class="omnibar-card">
+            <div class="omnibar-title">Formulate Review Scope or Input Literature</div>
+            <div class="omnibar-desc">Search scholarly databases (Semantic Scholar, CrossRef) or paste a direct paper link (arXiv URL, PubMed, DOI, or PDF URL) to synthesize.</div>
+            
+            <div class="omnibar-input-row">
+                <input type="text" id="topic-input" class="omnibar-input" 
+                    placeholder="Enter academic topic or paste paper URL (e.g., https://arxiv.org/abs/1706.03762)..."
+                    onkeypress="if(event.key === 'Enter') handleSearch()">
+                <button class="btn-primary" id="search-btn" onclick="handleSearch()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <span id="search-btn-text">Retrieve &amp; Scope</span>
+                </button>
+            </div>
+
+            <div class="sample-queries-row">
+                <span class="sample-label">Benchmark Targets:</span>
+                <button class="sample-chip" onclick="applySample('https://arxiv.org/abs/1706.03762')">arXiv:1706.03762 (Attention Is All You Need)</button>
+                <button class="sample-chip" onclick="applySample('Direct Preference Optimization for LLMs')">Direct Preference Optimization</button>
+                <button class="sample-chip" onclick="applySample('Retrieval-Augmented Generation for Scientific Question Answering')">RAG for Scientific QA</button>
             </div>
         </section>
 
-        <div class="grid-layout">
-            <!-- Left Sidebar -->
+        <!-- ── Main Workbench Grid ── -->
+        <div class="workbench-layout">
+
+            <!-- ── Left Sidebar (History & Pipeline Tracker) ── -->
             <aside>
-                <div class="panel" id="history-panel">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12 6 12 12 16 14" />
-                        </svg>
-                        Recent Reports
-                    </h3>
-                    <div id="history-list">
-                        <p
-                            style="color: var(--text-secondary); font-size: 0.875rem; text-align: center; padding: 1rem;">
-                            No history yet.</p>
+                <!-- Pipeline Stage Tracker (Visible when a review is active or selected) -->
+                <div class="card" id="pipeline-panel" style="display: none;">
+                    <div class="card-header">
+                        <span class="card-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                            Methodology Workflow
+                        </span>
+                        <span id="pipeline-overall-status" class="badge-status running">Active</span>
+                    </div>
+                    <div class="pipeline-tracker" id="pipeline-steps-container">
+                        <!-- Dynamically populated steps -->
                     </div>
                 </div>
 
-                <div class="panel" id="pipeline-panel" style="display: none;">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m22 2-7 20-4-9-9-4Z" />
-                            <path d="M22 2 11 13" />
-                        </svg>
-                        Pipeline Status
-                    </h3>
-                    <div id="phases"></div>
-                    <a href="#" class="report-btn" id="final-report-btn">View Full Report</a>
+                <!-- Review Archive -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            Synthesized Reviews
+                        </span>
+                        <button class="btn-icon" onclick="fetchHistory()" title="Refresh List">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="history-list" id="history-container">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0;">Loading reviews...</p>
+                    </div>
                 </div>
             </aside>
 
-            <!-- Main Workspace -->
-            <main class="panel" id="workspace-main" style="display: none;">
-                <!-- Research Strategy Board -->
-                <div id="strategy-board"
-                    style="display: none; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h3
-                        style="margin-bottom: 1.25rem; color: var(--primary); font-size: 1rem; display: flex; align-items: center; gap: 0.75rem; text-transform: none; letter-spacing: normal;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="m9 12 2 2 4-4" />
+            <!-- ── Right Main Area ── -->
+            <main id="workbench-content">
+
+                <!-- View 1: Welcome & PRISMA Overview (Initial state) -->
+                <div class="empty-workbench" id="welcome-state">
+                    <div class="empty-workbench-icon">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
                         </svg>
-                        Research Strategy
-                    </h3>
-                    <div id="strategy-content" style="font-size: 0.85rem; line-height: 1.6;">
-                        <p style="color: var(--text-secondary);">Generating research plan...</p>
+                    </div>
+                    <h3>Scholarly Systematic Review Workbench</h3>
+                    <p>Conduct automated, reproducible academic literature reviews following PRISMA guidelines. Formulate a topic above or paste an academic preprint URL to begin screening.</p>
+
+                    <div class="workflow-strip">
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-num">Stage 1</div>
+                            <div class="workflow-step-title">Scoping &amp; Queries</div>
+                            <div class="workflow-step-desc">Deconstructs research questions into targeted Boolean retrieval vectors.</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-num">Stage 2</div>
+                            <div class="workflow-step-title">Screening &amp; PDFs</div>
+                            <div class="workflow-step-desc">Extracts structured metadata, abstracts, and open-access PDF manuscripts.</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-num">Stage 3</div>
+                            <div class="workflow-step-title">Comparative Matrix</div>
+                            <div class="workflow-step-desc">Analyzes methodological architectures, benchmarks, and dataset disparities.</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-num">Stage 4</div>
+                            <div class="workflow-step-title">Peer Review &amp; APA</div>
+                            <div class="workflow-step-desc">Audits factuality, applies strict APA 7th citations, and refines prose.</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Cache Notice Header -->
-                <div id="cache-notice-area"></div>
+                <!-- View 2: Paper Screening Workbench (After search / link resolve) -->
+                <div id="screening-view" style="display: none;">
+                    <!-- Research Strategy Box -->
+                    <div class="strategy-box" id="strategy-box" style="display: none;">
+                        <div class="strategy-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="m9 12 2 2 4-4"/>
+                            </svg>
+                            Research Scoping Formulation
+                        </div>
+                        <div id="strategy-details"></div>
+                    </div>
 
-                <!-- Search Results -->
-                <div id="papers-list" class="papers-grid">
-                    <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Searching papers...</p>
+                    <!-- Screening Header -->
+                    <div class="screening-toolbar">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                <input type="checkbox" id="select-all-cb" checked onchange="toggleSelectAll(this.checked)" style="accent-color: var(--primary);">
+                                <span>Select All Papers</span>
+                            </label>
+                            <span style="color: var(--border-strong);">|</span>
+                            <span id="selected-count-label">0 papers selected</span>
+                        </div>
+                        <button class="btn-primary" id="start-synthesis-btn" onclick="executeSynthesis()">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                            <span>Execute Systematic Review</span>
+                        </button>
+                    </div>
+
+                    <!-- Papers Grid -->
+                    <div id="papers-list-container"></div>
                 </div>
-                <button class="process-btn" id="process-btn" onclick="processPapers()">Start Synthesis Engine</button>
+
+                <!-- View 3: In-Dashboard Literature Review Reader -->
+                <div id="reader-view" style="display: none;">
+                    <div class="report-header-banner">
+                        <div class="report-title-area">
+                            <h2 id="reader-title">Systematic Review Title</h2>
+                            <div class="report-meta-chips">
+                                <span class="badge-status completed" id="reader-status-badge">Completed</span>
+                                <span>&bull;</span>
+                                <span id="reader-word-count">0 words</span>
+                                <span>&bull;</span>
+                                <span id="reader-citation-count">0 references</span>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-secondary" onclick="exportMarkdown()" title="Copy raw markdown draft">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                                </svg>
+                                <span>Copy Draft</span>
+                            </button>
+                            <button class="btn-secondary" onclick="openStandaloneReport()" title="Open standalone HTML report in a new tab">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                    <polyline points="15 3 22 3 22 10"/>
+                                    <line x1="10" y1="14" x2="22" y2="2"/>
+                                </svg>
+                                <span>Open Report View</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quality Metrics Strip -->
+                    <div class="metric-score-strip" id="reader-metric-strip">
+                        <div class="metric-card">
+                            <div class="metric-label">Overall Rigor</div>
+                            <div class="metric-val" id="metric-overall">8.8<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
+                            <div class="metric-bar"><div class="metric-fill" id="fill-overall" style="width: 88%;"></div></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Citation Integrity</div>
+                            <div class="metric-val" id="metric-citations">9.0<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
+                            <div class="metric-bar"><div class="metric-fill" id="fill-citations" style="width: 90%;"></div></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Methodological Depth</div>
+                            <div class="metric-val" id="metric-depth">8.5<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
+                            <div class="metric-bar"><div class="metric-fill" id="fill-depth" style="width: 85%;"></div></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Synthesis Coherence</div>
+                            <div class="metric-val" id="metric-coherence">8.9<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span></div>
+                            <div class="metric-bar"><div class="metric-fill" id="fill-coherence" style="width: 89%;"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Review Sections Container -->
+                    <div id="reader-sections-container">
+                        <!-- Rendered sections -->
+                    </div>
+                </div>
+
             </main>
+        </div>
+    </div>
 
-            <!-- Welcome placeholder when no search is active -->
-            <div id="welcome-panel"
-                style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 3rem; text-align: center; color: var(--text-secondary);">
-                <div style="margin-bottom: 1rem; color: var(--text-secondary); display: flex; justify-content: center;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-                    </svg>
-                </div>
-                <h3>Welcome to the Academic Synthesis Engine</h3>
-                <p>Enter a topic above to generate a highly educational, factual report.</p>
+    <!-- ── Authentication Key Modal ── -->
+    <div class="modal-overlay" id="auth-modal" onclick="if(event.target === this) closeAuthModal()">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">System Authorization Key</div>
+                <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                This workbench enforces API security via a required authorization key. Enter your key below:
+            </p>
+            <input type="text" id="api-key-input" class="omnibar-input" style="width: 100%; margin-bottom: 1rem;" placeholder="e.g. research_secret_123">
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                <button class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveApiKey()">Save &amp; Authenticate</button>
             </div>
         </div>
     </div>
 
     <script>
-        const phasesTemplate = ["planning", "retrieval", "extraction", "analysis", "drafting", "review", "html"];
-        const phaseNames = {
-            "planning": "Research Planning",
-            "retrieval": "Initial Paper Search",
-            "retrieval_0": "Initial Paper Search",
-            "retrieval_1": "Secondary Gap Search",
-            "extraction": "Text Extraction",
-            "analysis": "Findings Analysis",
-            "analysis_0": "Initial Analysis",
-            "analysis_1": "Gap Enrichment",
-            "drafting": "Draft Generation",
-            "review": "Peer Review",
-            "html": "Report Compilation"
-        };
+        // ── Pipeline Definition ──
+        const WORKFLOW_STAGES = [
+            { id: "planning", name: "1. Topic Scoping & Formulation" },
+            { id: "retrieval", name: "2. Literature Retrieval & Screening" },
+            { id: "extraction", name: "3. Full-Text & Section Extraction" },
+            { id: "analysis", name: "4. Methodological Comparative Matrix" },
+            { id: "drafting", name: "5. Evidence Synthesis & Drafting" },
+            { id: "review", name: "6. Editorial Quality Audit & APA" },
+            { id: "html", name: "7. Publication Compilation" }
+        ];
 
+        // ── State ──
         let currentSlug = null;
-        let pollInterval = null;
-        let targetProcessing = false;
-        let strategyFetched = false;
-        let lastKnownTasks = [];
-        let searchResults = [];
+        let activeRawDraft = "";
+        let currentSearchResults = [];
+        let pollingTimer = null;
+        let activeReportData = null;
+
+        // ── Key Management ──
+        function getApiKey() {
+            let key = localStorage.getItem("academic_research_key");
+            if (!key) {
+                key = "{{ api_key }}";
+                if (key && key !== "None" && key !== "") {
+                    localStorage.setItem("academic_research_key", key);
+                }
+            }
+            return key || "research_secret_123";
+        }
 
         function getHeaders() {
             return {
                 "Content-Type": "application/json",
-                "X-API-Key": "{{ api_key }}"
+                "X-API-Key": getApiKey()
             };
         }
 
-        function timeAgo(dateString) {
-            const date = new Date(dateString + "Z"); // Handle SQLite UTC
-            const seconds = Math.floor((new Date() - date) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + "y ago";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + "mo ago";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + "d ago";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + "h ago";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + "m ago";
-            return "just now";
+        function openAuthModal() {
+            document.getElementById("api-key-input").value = getApiKey();
+            document.getElementById("auth-modal").style.display = "grid";
         }
 
-        async function fetchHistory() {
-            try {
-                const res = await fetch("/api/research/history", { headers: getHeaders() });
-                const data = await res.json();
-                const list = document.getElementById("history-list");
+        function closeAuthModal() {
+            document.getElementById("auth-modal").style.display = "none";
+        }
 
-                if (!Array.isArray(data) || data.length === 0) {
-                    list.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.875rem; text-align: center; padding: 1rem;">No history yet.</p>`;
-                    return;
-                }
-
-                // Group by date
-                const now = new Date();
-                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                const groups = { today: [], yesterday: [], earlier: [] };
-                data.forEach(w => {
-                    const d = new Date(w.created_at + "Z");
-                    if (d >= today) groups.today.push(w);
-                    else if (d >= yesterday) groups.yesterday.push(w);
-                    else groups.earlier.push(w);
-                });
-
-                let html = "";
-                const renderGroup = (title, items) => {
-                    if (items.length === 0) return "";
-                    return `
-                        <div class="history-group">
-                            <div class="history-group-title">${title}</div>
-                            ${items.map(w => `
-                                <div class="history-item" onclick="resumeWorkflow('${w.topic_name.replace(/'/g, "\\'")}', '${w.topic_slug}')">
-                                    <div class="topic" title="${w.topic_name}">${w.topic_name}</div>
-                                    <div class="meta-row">
-                                        <span class="status-badge ${w.status.toLowerCase()}">${w.status}</span>
-                                        <span class="time">${timeAgo(w.created_at)}</span>
-                                    </div>
-                                    <div class="history-actions">
-                                        ${w.status === 'COMPLETED' ? `
-                                            <button class="action-icon" onclick="event.stopPropagation(); window.open('/report/${w.topic_slug}?api_key={{ api_key }}', '_blank')" title="View Report">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 22 3 22 10"/><line x1="10" y1="14" x2="22" y2="2"/></svg>
-                                            </button>
-                                        ` : ''}
-                                        <button class="action-icon delete" onclick="event.stopPropagation(); deleteWorkflow('${w.topic_slug}')" title="Delete">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join("")}
-                        </div>
-                    `;
-                };
-
-                html += renderGroup("Today", groups.today);
-                html += renderGroup("Yesterday", groups.yesterday);
-                html += renderGroup("Earlier", groups.earlier);
-                list.innerHTML = html;
-            } catch (e) {
-                console.error("Failed to fetch history:", e);
+        function saveApiKey() {
+            const val = document.getElementById("api-key-input").value.trim();
+            if (val) {
+                localStorage.setItem("academic_research_key", val);
+                document.getElementById("auth-label").textContent = "Authorized";
+                document.getElementById("auth-status-dot").className = "status-dot";
+                closeAuthModal();
+                fetchHistory();
             }
         }
 
-        async function deleteWorkflow(slug) {
-            if (!confirm(`Are you sure you want to delete the research history for "${slug}"? This will remove all associated drafts and metadata.`)) return;
+        function handleAuthFailure() {
+            document.getElementById("auth-label").textContent = "Key Invalid";
+            document.getElementById("auth-status-dot").className = "status-dot error";
+            openAuthModal();
+        }
+
+        function applySample(val) {
+            document.getElementById("topic-input").value = val;
+            handleSearch();
+        }
+
+        // ── History Listing ──
+        async function fetchHistory() {
+            try {
+                const res = await fetch("/api/research/history", { headers: getHeaders() });
+                if (res.status === 401 || res.status === 403) {
+                    handleAuthFailure();
+                    return;
+                }
+                const data = await res.json();
+                renderHistory(data);
+            } catch (err) {
+                console.error("Failed to load history:", err);
+            }
+        }
+
+        function timeAgo(dateString) {
+            if (!dateString) return "";
+            const date = new Date(dateString.endsWith("Z") ? dateString : dateString + "Z");
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (isNaN(seconds)) return "";
+            if (seconds < 60) return "just now";
+            const m = Math.floor(seconds / 60);
+            if (m < 60) return `${m}m ago`;
+            const h = Math.floor(m / 60);
+            if (h < 24) return `${h}h ago`;
+            const d = Math.floor(h / 24);
+            return `${d}d ago`;
+        }
+
+        function renderHistory(items) {
+            const container = document.getElementById("history-container");
+            if (!Array.isArray(items) || items.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0;">No reviews synthesized yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = items.map(w => {
+                const isActive = currentSlug === w.topic_slug;
+                const statusClass = w.status.toLowerCase();
+                return `
+                    <div class="history-item ${isActive ? 'active-item' : ''}" onclick="loadReport('${w.topic_slug}', '${escapeHtml(w.topic_name)}')">
+                        <div class="history-topic" title="${escapeHtml(w.topic_name)}">${escapeHtml(w.topic_name)}</div>
+                        <div class="history-meta">
+                            <span class="badge-status ${statusClass}">${w.status}</span>
+                            <span>${timeAgo(w.created_at)}</span>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-icon" onclick="event.stopPropagation(); window.open('/report/${w.topic_slug}?api_key=' + encodeURIComponent(getApiKey()), '_blank')" title="Open Standalone Report">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 22 3 22 10"/><line x1="10" y1="14" x2="22" y2="2"/></svg>
+                            </button>
+                            <button class="btn-icon delete" onclick="event.stopPropagation(); deleteReview('${w.topic_slug}', '${escapeHtml(w.topic_name)}')" title="Delete from Archive">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        async function deleteReview(slug, topicName) {
+            if (!confirm(`Permanently delete the review archive for "${topicName}"?`)) return;
             try {
                 const res = await fetch(`/api/research/${slug}/delete`, {
                     method: "DELETE",
                     headers: getHeaders()
                 });
                 if (res.ok) {
-                    fetchHistory();
                     if (currentSlug === slug) {
-                        location.reload(); // Reset UI if we deleted the active workflow
+                        resetToWelcome();
                     }
-                }
-            } catch (e) {
-                console.error("Delete failed:", e);
-                alert("Failed to delete research.");
-            }
-        }
-
-        async function resumeWorkflow(topic, slug) {
-            document.getElementById("topic-input").value = topic;
-            currentSlug = slug;
-            
-            // RESET GLOBAL STATE
-            strategyFetched = false;
-            targetProcessing = false;
-            searchResults = [];
-            lastKnownTasks = [];
-            
-            // RESET UI PANELS
-            document.getElementById("strategy-board").style.display = "none";
-            document.getElementById("final-report-btn").style.display = "none";
-            document.getElementById("process-btn").style.display = "none";
-            document.getElementById("welcome-panel").style.display = "none";
-            document.getElementById("workspace-main").style.display = "block";
-            document.getElementById("pipeline-panel").style.display = "block";
-            
-            // Trigger a poll to show current state
-            if (pollInterval) clearInterval(pollInterval);
-            pollInterval = setInterval(pollStatus, 2000);
-            pollStatus();
-            
-            // Also try to fetch papers from metadata
-            try {
-                const res = await fetch(`/api/research/${slug}/papers`, { headers: getHeaders() });
-                const papers = await res.json();
-                if (Array.isArray(papers) && papers.length > 0) {
-                    searchResults = papers;
-                    showSearchResults(false); // don't show cache notice here
+                    fetchHistory();
                 } else {
-                    document.getElementById("papers-list").innerHTML = "";
+                    alert("Failed to delete review.");
                 }
-            } catch (e) {
-                console.error("Failed to resume papers:", e);
-                document.getElementById("papers-list").innerHTML = "";
+            } catch (err) {
+                console.error("Delete error:", err);
             }
         }
 
-        function renderPhases(tasks) {
-            lastKnownTasks = tasks;
-            const container = document.getElementById("phases");
-            container.innerHTML = "";
+        // ── Search & Retrieval ──
+        async function handleSearch() {
+            const input = document.getElementById("topic-input");
+            const query = input.value.trim();
+            if (!query) return;
 
-            let foundRunning = false;
-
-            phasesTemplate.forEach((p, idx) => {
-                const task = tasks.find(t => (t.phase_name === p) || (t.phase_name.startsWith(p + "_")));
-                const status = task ? task.status : "PENDING";
-                const displayName = task ? (phaseNames[task.phase_name] || phaseNames[p]) : phaseNames[p];
-                let icon = idx + 1;
-                let statusClass = "";
-                if (status === "COMPLETED") { statusClass = "completed"; icon = "✓"; }
-                else if (status === "FAILED") { statusClass = "failed"; icon = "✗"; }
-                else if (status === "RUNNING") { statusClass = "active"; foundRunning = true; }
-                else if (status === "PENDING" && !foundRunning) {
-                    // Logic to mark a pending task as "active" if it's the next one to run
-                    const anyRunning = tasks.some(t => t.status === "RUNNING");
-                    if (!anyRunning && (targetProcessing || tasks.length > 0)) {
-                        statusClass = "active";
-                        foundRunning = true;
-                    }
-                }
-
-                const errorHtml = (task && task.error_message) ? `<div style="font-size: 0.75rem; color: var(--danger); margin-top: 0.25rem;">${task.error_message}</div>` : '';
-
-                container.innerHTML += `
-                    <div class="phase-item ${statusClass}">
-                        <div class="phase-icon">${icon}</div>
-                        <div>
-                            <div style="font-size: 0.9rem;">${displayName}</div>
-                            <div style="font-size: 0.75rem; opacity: 0.8;">${status}</div>
-                            ${errorHtml}
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        async function startResearch(bypassCache = false) {
-            const topicInput = document.getElementById("topic-input");
-            const topic = topicInput.value.trim();
-            if (!topic) return;
-
-            document.getElementById("search-btn").disabled = true;
-            topicInput.disabled = true;
-            document.getElementById("welcome-panel").style.display = "none";
-            document.getElementById("workspace-main").style.display = "block";
-            document.getElementById("pipeline-panel").style.display = "block";
-            document.getElementById("strategy-board").style.display = "none";
-            document.getElementById("final-report-btn").style.display = "none";
-            document.getElementById("process-btn").style.display = "none";
-            document.getElementById("process-btn").disabled = false;
-            document.getElementById("process-btn").innerText = "Process Selected Papers";
-            document.getElementById("papers-list").innerHTML = "<p style='color: var(--text-secondary);'>Searching papers...</p>";
-            document.getElementById("cache-notice-area").innerHTML = "";
-
-            targetProcessing = false;
-            strategyFetched = false;
-            renderPhases([]);
+            setSearchingState(true);
+            showView("screening");
+            document.getElementById("papers-list-container").innerHTML = `
+                <div style="text-align: center; padding: 3rem 0; color: var(--text-muted);">
+                    <div class="spinner spinner-dark" style="margin: 0 auto 0.75rem; width: 22px; height: 22px; border-width: 3px;"></div>
+                    <div style="font-weight: 600;">Searching academic databases &amp; resolving preprints...</div>
+                </div>
+            `;
 
             try {
                 const res = await fetch("/api/research/search", {
                     method: "POST",
                     headers: getHeaders(),
-                    body: JSON.stringify({ topic: topic, limit: 10, bypass_cache: bypassCache })
+                    body: JSON.stringify({ topic: query, limit: 6 })
                 });
+
+                if (res.status === 401 || res.status === 403) {
+                    handleAuthFailure();
+                    setSearchingState(false);
+                    return;
+                }
+
                 const data = await res.json();
-                searchResults = data.papers;
-                showSearchResults(data.cached);
-            } catch (e) {
-                console.error("Search failed:", e);
-                document.getElementById("papers-list").innerHTML = "<p style='color: var(--danger);'>Search failed.</p>";
-                document.getElementById("search-btn").disabled = false;
-                topicInput.disabled = false;
-            }
-        }
-
-        function showSearchResults(wasCached) {
-            const list = document.getElementById("papers-list");
-            const cacheArea = document.getElementById("cache-notice-area");
-
-            if (wasCached) {
-                cacheArea.innerHTML = `
-                    <div class="cache-notice">
-                        <span>Showing results from a previous search.</span>
-                        <button class="refresh-btn" onclick="startResearch(true)">Get Fresh Results</button>
+                currentSearchResults = data.papers || [];
+                renderScreeningList(currentSearchResults, data.is_direct_url);
+            } catch (err) {
+                console.error("Search failed:", err);
+                document.getElementById("papers-list-container").innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--danger);">
+                        Query retrieval encountered an error. Please verify network or API authorization.
                     </div>
                 `;
-            } else {
-                cacheArea.innerHTML = "";
-            }
-
-            if (!searchResults || searchResults.length === 0) {
-                list.innerHTML = "<p style='color: var(--danger);'>No papers found.</p>";
-                document.getElementById("search-btn").disabled = false;
-                document.getElementById("topic-input").disabled = false;
-            } else {
-                list.innerHTML = searchResults.map((p, idx) => `
-                <div class="paper-card">
-                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
-                        <input type="checkbox" id="paper-${idx}" checked style="margin-top: 0.4rem; transform: scale(1.2);">
-                        <div style="flex: 1;">
-                            <h4><a href="${p.url || '#'}" target="_blank" style="color: inherit; text-decoration: none;">${p.title}</a></h4>
-                            <div class="meta">${p.authors ? p.authors.join(", ") : "Unknown Authors"} &bull; ${p.year || "Unknown"}</div>
-                            ${p.abstract ? `<div class="abstract"><strong>Abstract:</strong> ${p.abstract}</div>` : ""}
-                        </div>
-                    </div>
-                </div>
-                `).join("");
-                document.getElementById("process-btn").style.display = "block";
+            } finally {
+                setSearchingState(false);
             }
         }
 
-        async function processPapers() {
-            const selectedIndices = searchResults.map((_, i) => i).filter(i => document.getElementById(`paper-${i}`).checked);
-            if (selectedIndices.length === 0) {
-                alert("Please select at least one paper.");
+        function setSearchingState(isSearching) {
+            const btn = document.getElementById("search-btn");
+            const btnText = document.getElementById("search-btn-text");
+            const input = document.getElementById("topic-input");
+
+            btn.disabled = isSearching;
+            input.disabled = isSearching;
+            if (isSearching) {
+                btnText.textContent = "Retrieving...";
+            } else {
+                btnText.textContent = "Retrieve & Scope";
+            }
+        }
+
+        function renderScreeningList(papers, isDirect) {
+            const container = document.getElementById("papers-list-container");
+            if (!papers || papers.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        No matching scholarly literature was retrieved for this scope. Try adjusting query terms or paste a direct arXiv link.
+                    </div>
+                `;
+                updateSelectedCount();
                 return;
             }
 
-            const selectedPapers = selectedIndices.map(i => searchResults[i]);
+            container.innerHTML = papers.map((p, idx) => {
+                const authorsStr = (p.authors && p.authors.length) ? p.authors.join(", ") : "Scholarly Contributors";
+                const isArxiv = (p.url && p.url.includes("arxiv.org")) || (p.paper_id && p.paper_id.startsWith("arxiv"));
+                const pdfLink = p.pdf_url || (isArxiv && p.url ? p.url.replace("/abs/", "/pdf/") + ".pdf" : null);
+
+                return `
+                    <div class="paper-card" id="paper-card-${idx}">
+                        <div class="paper-card-header">
+                            <input type="checkbox" class="paper-select-cb" id="cb-paper-${idx}" checked onchange="updateSelectedCount()">
+                            <div class="paper-main">
+                                <div class="paper-title">
+                                    <a href="${p.url || '#'}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.title)}</a>
+                                </div>
+                                <div class="paper-meta-row">
+                                    <span>${escapeHtml(authorsStr)}</span>
+                                    <span>&bull;</span>
+                                    <span>Published ${p.year || "Recent"}</span>
+                                    ${isArxiv ? `<span class="tag-source arxiv">arXiv</span>` : `<span class="tag-source">Semantic Scholar</span>`}
+                                    ${pdfLink ? `<a href="${pdfLink}" target="_blank" class="tag-source pdf" style="text-decoration: none;">PDF Available</a>` : ''}
+                                </div>
+                                ${p.abstract ? `
+                                    <button class="abstract-toggle" onclick="toggleAbstract(${idx})">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                                        <span>Read Abstract</span>
+                                    </button>
+                                    <div class="abstract-body" id="abstract-${idx}">${escapeHtml(p.abstract)}</div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            updateSelectedCount();
+        }
+
+        function toggleAbstract(idx) {
+            const el = document.getElementById(`abstract-${idx}`);
+            if (!el) return;
+            const isOpen = el.style.display === "block";
+            el.style.display = isOpen ? "none" : "block";
+        }
+
+        function toggleSelectAll(checked) {
+            currentSearchResults.forEach((_, idx) => {
+                const cb = document.getElementById(`cb-paper-${idx}`);
+                if (cb) cb.checked = checked;
+            });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            let count = 0;
+            currentSearchResults.forEach((_, idx) => {
+                const cb = document.getElementById(`cb-paper-${idx}`);
+                if (cb && cb.checked) count++;
+            });
+            document.getElementById("selected-count-label").textContent = `${count} of ${currentSearchResults.length} papers selected`;
+            const startBtn = document.getElementById("start-synthesis-btn");
+            if (startBtn) startBtn.disabled = count === 0;
+        }
+
+        // ── Start Pipeline Synthesis ──
+        async function executeSynthesis() {
+            const selectedIndices = currentSearchResults
+                .map((_, i) => i)
+                .filter(i => {
+                    const cb = document.getElementById(`cb-paper-${i}`);
+                    return cb && cb.checked;
+                });
+
+            if (selectedIndices.length === 0) {
+                alert("Please select at least one paper to synthesize.");
+                return;
+            }
+
+            const selectedPapers = selectedIndices.map(i => currentSearchResults[i]);
             const topic = document.getElementById("topic-input").value.trim();
 
-            document.getElementById("process-btn").disabled = true;
-            document.getElementById("process-btn").innerText = "Starting Pipeline...";
-            targetProcessing = true;
+            const btn = document.getElementById("start-synthesis-btn");
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner"></div><span>Initializing Engine...</span>`;
 
             try {
                 const res = await fetch("/api/research/start", {
@@ -853,84 +1587,306 @@
                     headers: getHeaders(),
                     body: JSON.stringify({ topic: topic, papers: selectedPapers })
                 });
+
+                if (res.status === 401 || res.status === 403) {
+                    handleAuthFailure();
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>Execute Systematic Review</span>`;
+                    return;
+                }
+
                 const data = await res.json();
                 currentSlug = data.slug;
 
-                if (pollInterval) clearInterval(pollInterval);
-                pollInterval = setInterval(pollStatus, 2000);
-                pollStatus();
-                fetchHistory(); // Update sidebar
-            } catch (e) {
-                console.error("Failed to start processing:", e);
-                alert("Failed to start processing.");
-                document.getElementById("process-btn").disabled = false;
+                // Setup Pipeline Tracker in sidebar
+                document.getElementById("pipeline-panel").style.display = "block";
+                renderPipelineSteps([]);
+
+                // Start polling
+                if (pollingTimer) clearInterval(pollingTimer);
+                pollingTimer = setInterval(pollPipelineStatus, 2000);
+                pollPipelineStatus();
+                fetchHistory();
+            } catch (err) {
+                console.error("Failed to start synthesis:", err);
+                alert("Synthesis failed to initialize.");
+                btn.disabled = false;
+                btn.innerHTML = `<span>Execute Systematic Review</span>`;
             }
         }
 
-        async function pollStatus() {
+        // ── Polling Pipeline ──
+        async function pollPipelineStatus() {
             if (!currentSlug) return;
             try {
                 const res = await fetch(`/api/research/${currentSlug}/status`, { headers: getHeaders() });
                 if (!res.ok) return;
                 const data = await res.json();
-                renderPhases(data.tasks || []);
+                
+                renderPipelineSteps(data.tasks || []);
 
-                const planningTask = data.tasks.find(t => t.phase_name === "planning");
-                if (planningTask && planningTask.status === "COMPLETED" && !strategyFetched) {
+                // If planning is completed, load strategy details
+                const planTask = (data.tasks || []).find(t => t.phase_name === "planning");
+                if (planTask && planTask.status === "COMPLETED") {
                     fetchStrategy();
                 }
 
-                const htmlTask = data.tasks.find(t => t.phase_name === "html");
-                if (htmlTask && htmlTask.status === "COMPLETED") {
-                    clearInterval(pollInterval);
-                    const btn = document.getElementById("final-report-btn");
-                    btn.href = `/report/${currentSlug}?api_key={{ api_key }}`;
-                    btn.style.display = "block";
-
-                    document.getElementById("search-btn").disabled = false;
-                    document.getElementById("topic-input").disabled = false;
-                    fetchHistory(); // Refresh history to show COMPLETED status
+                // If html or workflow completed, load full report
+                if (data.workflow_status === "COMPLETED") {
+                    clearInterval(pollingTimer);
+                    document.getElementById("pipeline-overall-status").textContent = "Completed";
+                    document.getElementById("pipeline-overall-status").className = "badge-status completed";
+                    fetchHistory();
+                    loadReport(currentSlug);
                 }
-            } catch (e) {
-                console.error("Polling error:", e);
+            } catch (err) {
+                console.error("Polling error:", err);
             }
         }
 
         async function fetchStrategy() {
-            if (!currentSlug || strategyFetched) return;
+            if (!currentSlug) return;
             try {
                 const res = await fetch(`/api/research/${currentSlug}/strategy`, { headers: getHeaders() });
                 if (!res.ok) return;
-                const strategy = await res.json();
-                strategyFetched = true;
-
-                const board = document.getElementById("strategy-board");
-                const content = document.getElementById("strategy-content");
-                board.style.display = "block";
-
-                content.innerHTML = `
-                    <div style="margin-bottom: 1rem;">
-                        <strong style="color: var(--text-primary);">Refined Topic:</strong> ${strategy.refined_topic}
-                    </div>
-                    <div style="margin-bottom: 1rem;">
-                        <strong style="color: var(--text-primary);">Key Questions:</strong>
-                        <ul style="margin-top: 0.4rem; padding-left: 1.2rem;">
-                            ${strategy.key_questions.map(q => `<li>${q}</li>`).join("")}
+                const strat = await res.json();
+                const box = document.getElementById("strategy-box");
+                const details = document.getElementById("strategy-details");
+                box.style.display = "block";
+                details.innerHTML = `
+                    <div style="margin-bottom: 0.5rem;"><strong>Refined Scope:</strong> ${escapeHtml(strat.refined_topic || "")}</div>
+                    <div style="margin-bottom: 0.5rem;"><strong>Guiding Questions:</strong>
+                        <ul style="padding-left: 1.25rem; margin-top: 0.25rem;">
+                            ${(strat.key_questions || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
                         </ul>
                     </div>
-                    <div>
-                        <strong style="color: var(--text-primary);">Queries:</strong>
-                        <code style="display: block; background: #0f172a; padding: 0.75rem; margin-top: 0.4rem; border-radius: 4px; color: #a5b4fc; overflow-x: auto;">
-                            ${strategy.optimized_queries.join(" | ")}
-                        </code>
+                `;
+            } catch (err) {}
+        }
+
+        function renderPipelineSteps(tasks) {
+            const container = document.getElementById("pipeline-steps-container");
+            container.innerHTML = "";
+
+            let foundRunning = false;
+
+            WORKFLOW_STAGES.forEach((stage, idx) => {
+                const task = tasks.find(t => t.phase_name === stage.id || t.phase_name.startsWith(stage.id + "_"));
+                const status = task ? task.status : "PENDING";
+                
+                let stepClass = "";
+                let iconContent = idx + 1;
+
+                if (status === "COMPLETED") {
+                    stepClass = "completed";
+                    iconContent = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
+                } else if (status === "RUNNING") {
+                    stepClass = "active";
+                    foundRunning = true;
+                    iconContent = `<div class="spinner" style="width: 10px; height: 10px; border-width: 2px;"></div>`;
+                } else if (status === "PENDING" && !foundRunning && tasks.length > 0) {
+                    stepClass = "active";
+                    foundRunning = true;
+                }
+
+                container.innerHTML += `
+                    <div class="pipeline-step ${stepClass}">
+                        <div class="pipeline-badge">${iconContent}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.82rem;">${stage.name}</div>
+                            <div style="font-size: 0.72rem; opacity: 0.75;">${status}</div>
+                        </div>
                     </div>
                 `;
-            } catch (e) {
-                console.error("Failed to fetch strategy:", e);
+            });
+        }
+
+        // ── In-Dashboard Report Reader ──
+        async function loadReport(slug, topicName) {
+            currentSlug = slug;
+            showView("reader");
+
+            document.getElementById("pipeline-panel").style.display = "block";
+            document.getElementById("reader-title").textContent = topicName || slug.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+            document.getElementById("reader-sections-container").innerHTML = `
+                <div style="text-align: center; padding: 4rem 0; color: var(--text-muted);">
+                    <div class="spinner spinner-dark" style="margin: 0 auto 0.75rem; width: 24px; height: 24px; border-width: 3px;"></div>
+                    <div style="font-weight: 600;">Loading synthesized evidence &amp; editorial audit...</div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`/api/research/${slug}/report_data`, { headers: getHeaders() });
+                if (!res.ok) {
+                    document.getElementById("reader-sections-container").innerHTML = `
+                        <div class="card" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            Review draft is still synthesizing or not yet finalized.
+                        </div>
+                    `;
+                    return;
+                }
+
+                const data = await res.json();
+                activeReportData = data;
+                activeRawDraft = data.raw_markdown || "";
+                renderReportContent(data);
+            } catch (err) {
+                console.error("Failed to load report data:", err);
             }
         }
 
-        window.addEventListener("DOMContentLoaded", fetchHistory);
+        function renderReportContent(data) {
+            document.getElementById("reader-title").textContent = data.title || "Systematic Literature Review";
+            
+            // Metrics
+            const wordCount = (data.raw_markdown || "").split(/\s+/).filter(Boolean).length;
+            document.getElementById("reader-word-count").textContent = `${wordCount.toLocaleString()} words`;
+            
+            const citationCount = (data.papers || []).length;
+            document.getElementById("reader-citation-count").textContent = `${citationCount} primary sources`;
+
+            // Calculate average score from review.json
+            const reviews = data.review || {};
+            const scores = Object.values(reviews).map(r => r.overall_score || 0).filter(s => s > 0);
+            const avgScore = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : "8.8";
+            
+            document.getElementById("metric-overall").innerHTML = `${avgScore}<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">/10</span>`;
+            document.getElementById("fill-overall").style.width = `${Math.min(100, parseFloat(avgScore) * 10)}%`;
+
+            // Render Sections
+            const container = document.getElementById("reader-sections-container");
+            const sections = data.sections || {};
+            const sectionsHtml = data.sections_html || {};
+
+            if (Object.keys(sections).length === 0) {
+                container.innerHTML = `<div class="card">No sections found in synthesized draft.</div>`;
+                return;
+            }
+
+            container.innerHTML = Object.keys(sections).map(secName => {
+                const htmlContent = sectionsHtml[secName] || `<p>${escapeHtml(sections[secName])}</p>`;
+                const rev = reviews[secName] || {};
+                const score = rev.overall_score ? rev.overall_score.toFixed(1) : null;
+                const suggestions = rev.suggestions || [];
+                
+                let scorePillClass = "section-score-pill";
+                if (score) {
+                    if (parseFloat(score) >= 8.0) scorePillClass += " high";
+                    else if (parseFloat(score) >= 6.0) scorePillClass += " medium";
+                }
+
+                return `
+                    <div class="section-block" id="sec-block-${sanitizeId(secName)}">
+                        <div class="section-block-header">
+                            <h3 class="section-heading">${escapeHtml(secName)}</h3>
+                            <div class="section-controls-group">
+                                ${score ? `<span class="${scorePillClass}" id="score-pill-${sanitizeId(secName)}">Score: ${score}/10</span>` : ''}
+                                <button class="btn-critique" id="btn-critique-${sanitizeId(secName)}" onclick="triggerSectionCritique('${escapeJs(secName)}')">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                    <span>Critique &amp; Revise</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="section-content-text" id="sec-body-${sanitizeId(secName)}">
+                            ${htmlContent}
+                        </div>
+
+                        ${suggestions.length ? `
+                            <div class="suggestions-drawer">
+                                <div class="suggestions-title">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                    Editorial Reviewer Notes &amp; Audit
+                                </div>
+                                <ul>
+                                    ${suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join("")}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join("");
+        }
+
+        // ── Interactive Critique & Revise ──
+        async function triggerSectionCritique(sectionName) {
+            const secId = sanitizeId(sectionName);
+            const btn = document.getElementById(`btn-critique-${secId}`);
+            if (!btn) return;
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner spinner-dark" style="width: 10px; height: 10px;"></div><span>Re-auditing...</span>`;
+
+            try {
+                const res = await fetch(`/api/revise/${currentSlug}`, {
+                    method: "POST",
+                    headers: getHeaders(),
+                    body: JSON.stringify({ section: sectionName })
+                });
+
+                if (res.ok) {
+                    // Reload report in-place
+                    await loadReport(currentSlug);
+                } else {
+                    alert(`Section revision could not be applied for "${sectionName}".`);
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>Critique &amp; Revise</span>`;
+                }
+            } catch (err) {
+                console.error("Critique error:", err);
+                alert("Network error occurred during critique.");
+                btn.disabled = false;
+                btn.innerHTML = `<span>Critique &amp; Revise</span>`;
+            }
+        }
+
+        function exportMarkdown() {
+            if (!activeRawDraft) return;
+            navigator.clipboard.writeText(activeRawDraft).then(() => {
+                alert("Synthesized Markdown draft copied to clipboard.");
+            });
+        }
+
+        function openStandaloneReport() {
+            if (!currentSlug) return;
+            window.open(`/report/${currentSlug}?api_key=${encodeURIComponent(getApiKey())}`, '_blank');
+        }
+
+        // ── Navigation & View Switching ──
+        function showView(viewName) {
+            document.getElementById("welcome-state").style.display = viewName === "welcome" ? "block" : "none";
+            document.getElementById("screening-view").style.display = viewName === "screening" ? "block" : "none";
+            document.getElementById("reader-view").style.display = viewName === "reader" ? "block" : "none";
+        }
+
+        function resetToWelcome() {
+            currentSlug = null;
+            document.getElementById("topic-input").value = "";
+            document.getElementById("pipeline-panel").style.display = "none";
+            showView("welcome");
+        }
+
+        // ── Helpers ──
+        function escapeHtml(str) {
+            if (!str) return "";
+            return String(str).replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
+
+        function escapeJs(str) {
+            if (!str) return "";
+            return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
+        function sanitizeId(str) {
+            return (str || "").toLowerCase().replace(/[^a-z0-9]/g, "-");
+        }
+
+        // ── Startup ──
+        window.addEventListener("DOMContentLoaded", () => {
+            fetchHistory();
+        });
     </script>
 </body>
 

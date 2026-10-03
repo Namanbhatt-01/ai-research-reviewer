@@ -131,7 +131,7 @@ class PipelineOrchestrator:
 
     def run_phase_analysis(self) -> Tuple[bool, Optional[Dict[str, Any]]]:
         task_name = f"analysis_{self.loop_count}"
-        if not self._should_run_phase(task_name): return True
+        if not self._should_run_phase(task_name): return True, None
         task_id = self.state.create_or_start_task(self.workflow_id, task_name)
         try:
             logger.info("--- Phase 3: Analysis ---")
