@@ -6,27 +6,21 @@
 [![Infosys Springboard](https://img.shields.io/badge/Program-Infosys%20Springboard-007CC3)](https://infyspringboard.onwingspan.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Infosys Springboard Internship Project**  
+> **Infosys Springboard Internship 6.0 (Batch 13)**  
 > **Mentor:** Ankit Kumar Tripathy, Data Scientist  
 > **Author:** Naman Bhatt  
 
-An autonomous, multi-agent AI system designed to conduct systematic literature reviews and cross-paper syntheses. Powered by a stateful **LangGraph StateGraph** architecture, it automates the full pipeline from academic scoping and PDF retrieval to parallel draft generation and self-correcting peer-review loops.
+An autonomous, multi-agent AI system designed to conduct systematic literature reviews and cross-paper syntheses. Powered by a stateful **LangGraph StateGraph** architecture, it automates the full pipeline from academic scoping and PDF retrieval to parallel section drafting and self-correcting peer-review loops.
 
 ---
 
 ## 📌 Table of Contents
 - [Architecture & Workflow](#-architecture--workflow)
-- [Milestone Delivery Checklist](#-milestone-delivery-checklist)
-- [Key Features](#-key-features)
-- [System Requirements & Tech Stack](#-system-requirements--tech-stack)
-- [Quickstart & Installation](#-quickstart--installation)
-- [Usage Modes](#-usage-modes)
-  - [1. Autonomous CLI Execution](#1-autonomous-cli-execution)
-  - [2. Interactive Modern Web Dashboard](#2-interactive-modern-web-dashboard)
-  - [3. Graph Visualization & Export](#3-graph-visualization--export)
+- [Key Capabilities](#-key-capabilities)
+- [Tech Stack](#-tech-stack)
+- [Quickstart & Usage](#-quickstart--usage)
 - [Project Structure](#-project-structure)
-- [Quality Scoring & Peer-Review Heuristics](#-quality-scoring--peer-review-heuristics)
-- [Internship Certificate](#-internship-certificate-of-completion)
+- [Internship Certificate of Completion](#-internship-certificate-of-completion)
 - [License & Acknowledgments](#-license--acknowledgments)
 
 ---
@@ -72,129 +66,81 @@ graph TD;
     final_draft --> __end__([__end__])
 ```
 
-![Architecture Graph](docs/architecture_graph.png)
+<p align="center">
+  <img src="docs/architecture_graph.png" alt="LangGraph Architecture Diagram" width="850"/>
+</p>
 
-### StateGraph Nodes Breakdown
-1. **`process_input`**: Normalizes topic slug, initializes persistent state tracking in SQLite, and validates parameters.
-2. **`planner`**: Evaluates research scope, formulates core research questions, and derives optimized search queries.
-3. **`researcher`**: Chooses primary queries or targeted secondary queries when triggered by gap detection.
-4. **`search_articles`**: Queries the **Semantic Scholar API** (with automated **arXiv** fallback) for relevant open-access papers.
-5. **`article_decisions`**: Evaluates candidates based on PDF availability, recency, and abstract richness (configurable limit, default: 3).
-6. **`download_articles`**: Downloads open-access PDFs and validates document integrity.
-7. **`paper_analyzer`**: Extracts structured markdown via `PyMuPDF4LLM` and isolates problem statements, methodologies, empirical discoveries, and novelty.
-8. **Parallel Section Drafters**:
-   - `write_abstract`: Generates an impactful abstract constrained strictly to **<= 100 words**.
-   - `write_introduction`: Introduces the problem landscape, core concepts, and questions.
-   - `write_methods`: Synthesizes experimental protocols and compares algorithms across papers.
-   - `write_results`: Consolidates concrete discoveries, metrics, and empirical findings.
-   - `write_conclusion`: Synthesizes final takeaways, practical implications, and future directions.
-   - `write_references`: Generates deterministic **APA 7th-edition** bibliography and citation mappings.
-9. **`aggregate_paper`**: Joins all 6 drafted sections into a unified `draft.md`.
-10. **`critique_paper`**: Multi-dimensional quality evaluation (0–10) checking clarity, academic rigor, completeness, and citation usage. Also detects cross-paper knowledge gaps.
-11. **`revise_paper`**: Rewrites weak sections incorporating specific actionable feedback, then loops back to `critique_paper`.
-12. **`final_draft`**: Packages the publication-ready paper and compiles a standalone HTML report.
+### Pipeline Execution Stages:
+1. **Scoping & Planning (`planner`)**: Deconstructs the research topic, identifies key research questions, and prepares targeted search queries.
+2. **Retrieval (`search_articles`, `download_articles`)**: Queries Semantic Scholar with automatic arXiv fallback, or directly ingests user-provided paper URLs/PDFs.
+3. **Deep Extraction (`paper_analyzer`)**: Uses `PyMuPDF4LLM` to extract multi-column academic text, isolate methodologies, and identify empirical findings.
+4. **Parallel Section Drafting (`write_*`)**: Fans out to generate Abstract (strictly $\le 100$ words), Introduction, Comparative Methods, Empirical Results, Synthesis, and deterministic APA 7th bibliography simultaneously.
+5. **Quality Assessment & Self-Correction (`critique_paper`, `revise_paper`)**: Evaluates drafts using heuristic rubrics (Clarity, Rigor, Completeness, Citations). Re-routes weak sections for automated refinement before producing the final draft.
 
 ---
 
-## 🏆 Milestone Delivery Checklist
+## ⚡ Key Capabilities
 
-| Milestone | Target Weeks | Requirements | Status |
-| :--- | :---: | :--- | :---: |
-| **Milestone 1** | Week 1–2 | • Setup environment & dependencies.<br>• Automated search via Semantic Scholar API & arXiv.<br>• Automatic PDF selection and download.<br>• Metadata dataset preparation (`papers.json`). | ✅ Complete |
-| **Milestone 2** | Week 3–4 | • PyMuPDF4LLM section-wise parsing.<br>• Structured text extraction to Markdown.<br>• Key finding extraction (problems, methods, results, novelty).<br>• Cross-paper comparison matrix (`comparison.md`). | ✅ Complete |
-| **Milestone 3** | Week 5–6 | • Parallel GPT-based section drafting.<br>• Strict 100-word limit enforcement on Abstract.<br>• Comparative Methods and Results synthesis.<br>• Deterministic APA 7th-edition reference formatting. | ✅ Complete |
-| **Milestone 4** | Week 7–8 | • AI Peer-Review quality evaluation (0–10 scores).<br>• Automated revision loopback (`revise_paper` & gap re-search).<br>• **Gradio UI** with interactive 'Critique / Revise' controls.<br>• Modern interactive Web Dashboard (Flask/HTML5).<br>• Final compilation of standalone report. | ✅ Complete |
-
----
-
-## ⚡ Key Features
-
-- **Stateful LangGraph Orchestration**: Built with cyclic execution, fan-out parallel drafting, and intelligent self-reflection.
-- **Direct Paper Link & PDF Support (Web/PDF)**: Feed any academic paper link (e.g. arXiv abstract, Nature, ScienceDirect, OpenReview, or direct `.pdf` link). The system automatically resolves metadata, retrieves the PDF, and initiates deep section drafting without manual searches.
-- **Smart Dual Retrieval**: Semantic Scholar as primary open-access provider with automatic fallback to arXiv.
-- **Rich Document Extraction**: Converts multi-column academic PDFs to clean Markdown using `PyMuPDF4LLM`.
-- **Parallel Fan-out Section Drafting**: Synthesizes Abstract, Introduction, Methods, Results, Conclusion, and APA References simultaneously.
-- **Iterative Reflection & AI Peer Review**: Evaluates prose quality with automated scoring (0–10) across clarity, rigor, and citation density.
-- **Dual UI Flexibility**:
-  - **Modern Web Dashboard**: Glassmorphic UI with pipeline status, interactive paper picker, and real-time history.
-  - **Milestone 4 Gradio App**: Native Gradio interface with dedicated tabs and live "Critique / Revise" buttons.
+- **Direct Paper Link & PDF Ingestion**: Accepts direct URLs (arXiv, Nature, DOI, or direct `.pdf` links) to review specific literature on demand without search ambiguity.
+- **Smart Dual Retrieval**: Combines the Semantic Scholar academic graph with arXiv fallback for open-access PDF resolution.
+- **Parallel Multi-Agent Drafting**: Independent specialized agents draft discrete sections simultaneously, merging into a unified synthesis.
+- **Rigorous Heuristic Peer-Review**: Evaluates academic prose across clarity, citation density, and structure with automatic rewrite loops.
+- **Production Web Dashboard**: Responsive single-page workbench featuring interactive paper screening, live progress timelines, KaTeX mathematical typesetting, inline section critique/revision, and publication exports (`Copy`, `.md`, `Print/PDF`).
 
 ---
 
-## 💻 System Requirements & Tech Stack
+## 💻 Tech Stack
 
-- **Language:** Python 3.10+
 - **Orchestration:** `langgraph`, `langchain-core`
-- **PDF Extraction:** `pymupdf4llm`
-- **LLM Engine:** OpenAI API / OpenRouter (`gpt-4o-mini`, `gpt-4o`, etc.)
-- **User Interface:** Full-Stack Modern Web Application (`flask`, vanilla CSS/JS)
-- **State & Storage:** SQLite (`data/state.db`) + local file artifacts
+- **PDF Extraction:** `pymupdf4llm`, `pymupdf`
+- **LLM Engine:** OpenAI API / OpenRouter (`gpt-4o-mini`, `gpt-4o`)
+- **Web Application:** Python Flask, Vanilla CSS (Glassmorphic Dark Theme), KaTeX
+- **State & Persistence:** SQLite (`data/state.db`) + Structured File Ledger
 
 ---
 
-## 🚀 Quickstart & Installation
+## 🚀 Quickstart & Usage
 
-### 1. Clone the repository
+### 1. Installation
 ```bash
-git clone https://github.com/<your-username>/ai-research-reviewer.git
+# Clone the repository
+git clone https://github.com/Namanbhatt-01/ai-research-reviewer.git
 cd ai-research-reviewer
-```
 
-### 2. Set up virtual environment
-```bash
+# Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment variables
-Copy `.env.example` to `.env`:
-```bash
-cp .env.example .env
-```
-Edit `.env` with your API credentials:
+### 2. Configuration
+Copy `.env.example` to `.env` and add your API credentials:
 ```env
-OPENAI_API_KEY=your_openai_or_openrouter_key_here
+OPENAI_API_KEY=your_openai_or_openrouter_api_key
 OPENAI_BASE_URL=https://api.openai.com/v1   # or https://openrouter.ai/api/v1
 APP_API_KEY=research_secret_123
 ```
 
----
+### 3. Running the Application
 
-## 🎮 Usage Modes
-
-### 1. Autonomous CLI Execution
-Execute the entire LangGraph workflow directly from your terminal:
-
-**A. By Topic Search:**
-```bash
-python main.py run "Quantum Key Distribution in Satellite Networks" --limit 3
-```
-
-**B. By Direct Paper Link (Web or PDF URL):**
-```bash
-# Review an arXiv paper directly
-python main.py run "https://arxiv.org/abs/1706.03762"
-
-# Review a direct PDF link
-python main.py run "https://arxiv.org/pdf/1706.03762.pdf"
-
-# Review multiple papers via --url flag
-python main.py run --url "https://arxiv.org/abs/1706.03762,https://arxiv.org/abs/2303.08774"
-```
-
-### 2. Interactive Modern Web Dashboard
-Launch the polished web dashboard:
+#### A. Interactive Web Dashboard (Recommended)
 ```bash
 python main.py ui --port 5001
 ```
-Open `http://localhost:5001` in your browser. Enter `APP_API_KEY` (configured in `.env`) to access:
-- Live paper search and interactive paper screening.
-- Real-time pipeline execution progress timeline.
-- Embedded literature review reader with KaTeX formulas, section refinement, and publication exports.
+Open `http://localhost:5001` in your browser. Enter your `APP_API_KEY` to access paper screening, live pipeline execution, and interactive literature review reading.
 
-### 3. Graph Visualization & Export
-Display the architecture diagram and export it to PNG/Mermaid:
+#### B. Autonomous Terminal Orchestrator
+```bash
+# Review a research topic
+python main.py run "Quantum Key Distribution in Satellite Networks" --limit 3
+
+# Review a paper directly from a link or PDF
+python main.py run "https://arxiv.org/abs/1706.03762"
+```
+
+#### C. Export Graph Architecture Diagram
 ```bash
 python main.py graph --export docs/architecture_graph.png
 ```
@@ -205,34 +151,35 @@ python main.py graph --export docs/architecture_graph.png
 
 ```
 .
-├── main.py                     # Unified CLI & entry point
-├── requirements.txt            # Dependency specifications
-├── README.md                   # Project documentation
-├── .env.example                # Environment template
+├── main.py                     # Unified CLI: Terminal Orchestrator & Web Server
+├── requirements.txt            # Production dependencies
+├── README.md                   # Documentation & overview
+├── LICENSE                     # MIT License
+├── .env.example                # Configuration template
 │
 ├── src/
-│   ├── graph/                  # LangGraph StateGraph engine
-│   │   ├── state.py            # TypedDict ResearchState schema
-│   │   ├── nodes.py            # 16 Graph nodes implementation
-│   │   └── workflow.py         # Graph compilation, edges & routing
-│   │
-│   ├── core/                   # Core research engines
-│   │   ├── planner.py          # Scoping and strategy formulation
-│   │   ├── retrieval.py        # Semantic Scholar & arXiv client
-│   │   ├── extraction.py       # PyMuPDF4LLM PDF parser
-│   │   ├── analysis.py         # Finding extraction & gap detection
-│   │   ├── drafting.py         # 6-section academic drafting
-│   │   ├── references.py       # APA 7th bibliography generator
-│   │   └── reviewer.py         # AI peer-review & heuristic scoring
-│   │
-│   ├── api/                    # Web Application & REST API
-│   │   ├── app.py              # Flask server & background runners
-│   │   ├── security.py         # Auth & rate-limiting middleware
+│   ├── api/                    # Web Application & Security Layer
+│   │   ├── app.py              # Flask server, background runners, streaming endpoints
+│   │   ├── security.py         # API key auth, rate-limiter, path traversal sanitizer
 │   │   └── templates/
-│   │       └── dashboard.html  # Glassmorphic SaaS dashboard
+│   │       └── dashboard.html  # Modern single-page research workbench
+│   │
+│   ├── core/                   # Core Research Engines
+│   │   ├── planner.py          # Topic scoping and query formulation
+│   │   ├── retrieval.py        # Semantic Scholar & direct paper/PDF resolver
+│   │   ├── extraction.py       # PyMuPDF section-by-section text extractor
+│   │   ├── analysis.py         # Finding extraction & cross-paper gap detection
+│   │   ├── drafting.py         # 6-section academic drafting engine
+│   │   ├── references.py       # APA 7th bibliography generator & citation linker
+│   │   └── reviewer.py         # Heuristic scoring (0–10) & LLM section refinement
+│   │
+│   ├── graph/                  # LangGraph Workflow Architecture
+│   │   ├── state.py            # TypedDict ResearchState schema
+│   │   ├── nodes.py            # 16 Graph node functions
+│   │   └── workflow.py         # Graph compilation & feedback routing
 │   │
 │   ├── reports/
-│   │   └── report_generator.py # Standalone HTML report generator
+│   │   └── report_generator.py # Standalone offline HTML export generator
 │   │
 │   ├── data/
 │   │   └── state_manager.py    # SQLite state & artifact ledger
@@ -240,29 +187,18 @@ python main.py graph --export docs/architecture_graph.png
 │   └── utils/
 │       └── logger.py           # Structured logger
 │
-├── data/                       # Local research artifact store (git-ignored)
-│   ├── raw_pdfs/               # Downloaded research PDFs
-│   ├── processed_text/         # Extracted markdown documents
-│   ├── analysis/               # JSON findings & comparison matrix
-│   ├── metadata/               # strategy.json & papers.json
-│   └── drafts/                 # draft.md, refined_draft.md, report.html
+├── tests/                      # Automated Test Suite (16/16 Passing)
+│   ├── test_api_and_ui.py
+│   ├── test_drafting_and_references.py
+│   ├── test_graph_workflow.py
+│   ├── test_retrieval.py
+│   └── test_reviewer.py
 │
-└── docs/
+└── docs/                       # Architecture & Assets
     ├── architecture_graph.png  # Rendered LangGraph state diagram
-    └── architecture_graph.mermaid
+    ├── architecture_graph.mermaid
+    └── certificate_of_completion.png
 ```
-
----
-
-## 📊 Quality Scoring & Peer-Review Heuristics
-
-The `DraftReviewer` module evaluates each generated draft across four dimensions:
-1. **Clarity**: Analyzes sentence length variance, readability, and readability penalties for overly dense prose.
-2. **Academic Rigor**: Evaluates critical thinking keywords (`contrast`, `limitation`, `bottleneck`, `tension`).
-3. **Completeness**: Checks section-specific word budgets (including the **<= 100-word** constraint on the Abstract).
-4. **Citation Usage**: Regex-based verification of `(Author, Year)` and `(Author et al., Year)` in-text citations.
-
-If any section scores below the threshold (`REVIEW_PASSING_SCORE = 7`), the system triggers an automatic rewrite prompt with precise feedback.
 
 ---
 
