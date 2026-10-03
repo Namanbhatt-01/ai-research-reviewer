@@ -293,8 +293,9 @@ def main():
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # run command
-    parser_run = subparsers.add_parser("run", help="Start or resume a topic workflow")
-    parser_run.add_argument("topic", type=str, help="Research topic")
+    parser_run = subparsers.add_parser("run", help="Start or resume a topic workflow or review specific paper URL")
+    parser_run.add_argument("topic", type=str, nargs="?", default="", help="Research topic OR direct paper web/PDF URL")
+    parser_run.add_argument("--url", type=str, default="", help="Direct paper URL(s) to review (web link or PDF, comma-separated)")
     parser_run.add_argument("--limit", type=int, default=3, help="Number of papers to retrieve (default: 3)")
     parser_run.add_argument("--engine", type=str, default="langgraph", choices=["langgraph", "legacy"], help="Execution engine (default: langgraph)")
     parser_run.add_argument("--max-revisions", type=int, default=1, help="Maximum AI peer-review revision iterations (default: 1)")
@@ -339,10 +340,22 @@ def main():
         return
 
     if args.command == "run":
+        target = args.url.strip() if args.url.strip() else args.topic.strip()
+        if not target:
+            parser_run.error("Please specify a research topic or paper link (e.g. python main.py run 'https://arxiv.org/abs/1706.03762')")
+
+        urls = [u.strip() for u in args.url.split(",") if u.strip()] if args.url else []
+        topic_str = args.topic if args.topic else target
+
         if args.engine == "langgraph":
             from src.graph.workflow import run_research_workflow
-            print(f"\n--- Launching LangGraph Workflow for '{args.topic}' ---")
-            result = run_research_workflow(args.topic, limit=args.limit, max_revisions=args.max_revisions)
+            print(f"\n--- Launching LangGraph Workflow for: '{target}' ---")
+            result = run_research_workflow(
+                topic=topic_str,
+                limit=args.limit,
+                max_revisions=args.max_revisions,
+                paper_urls=urls if urls else None,
+            )
             report_path = result.get("html_report_path", "")
             print(f"\nResearch Workflow Complete!")
             if report_path:
@@ -351,7 +364,7 @@ def main():
             print(f"Launch Gradio UI:     python main.py gradio\n")
             return
         else:
-            orch = PipelineOrchestrator(args.topic, limit=args.limit)
+            orch = PipelineOrchestrator(topic_str, limit=args.limit)
             orch.run_all()
             if orch.state.get_or_create_workflow(orch.topic_name, orch.slug)['status'] == 'COMPLETED':
                 print(f"\nReport ready! Launch UI with:\n  python main.py ui")

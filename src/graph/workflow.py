@@ -9,7 +9,7 @@ __start__ -> process_input -> planner -> researcher -> search_articles
 """
 
 import os
-from typing import Dict, Any, Literal
+from typing import Dict, Any, Literal, Optional, List
 from langgraph.graph import StateGraph, START, END
 
 from src.graph.state import ResearchState
@@ -133,8 +133,13 @@ def build_research_graph() -> StateGraph:
 research_app = build_research_graph().compile()
 
 
-def run_research_workflow(topic: str, limit: int = 3, max_revisions: int = 2) -> Dict[str, Any]:
-    """Runs the LangGraph research workflow for a given academic topic."""
+def run_research_workflow(
+    topic: str,
+    limit: int = 3,
+    max_revisions: int = 2,
+    paper_urls: Optional[list] = None
+) -> Dict[str, Any]:
+    """Runs the LangGraph research workflow for a given academic topic or set of direct URLs."""
     initial_state: ResearchState = {
         "topic": topic,
         "limit": limit,
@@ -142,8 +147,9 @@ def run_research_workflow(topic: str, limit: int = 3, max_revisions: int = 2) ->
         "max_search_cycles": 1,
         "revision_count": 0,
         "search_cycle": 0,
+        "paper_urls": paper_urls or [],
     }
-    logger.info(f"Starting LangGraph workflow for topic: '{topic}'")
+    logger.info(f"Starting LangGraph workflow for: '{topic}' (Direct URLs: {paper_urls})")
     final_output = research_app.invoke(initial_state)
     logger.info(f"LangGraph workflow finished with status: {final_output.get('status')}")
     return final_output

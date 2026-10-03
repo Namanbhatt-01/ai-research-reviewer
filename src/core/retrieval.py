@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import xml.etree.ElementTree as ET
 import requests
@@ -71,14 +72,228 @@ class PaperRetriever:
         self.session.mount("https://", adapter)
 
     # ------------------------------------------------------------------
-    # Public interface
+    # URL & Direct Paper Resolution
+    # ------------------------------------------------------------------
+    @staticmethod
+    def is_url(text: str) -> bool:
+        """Determines if a given input string is a web link or academic paper identifier."""
+        t = text.strip()
+        if t.startswith(("http://", "https://", "ftp://", "arxiv:", "doi:")):
+            return True
+        if re.match(r"^(?:10\.\d{4,9}/[-._;()/:A-Za-z0-9]+|[0-9]{4}\.[0-9]{4,5}(?:v[0-9]+)?)$", t):
+            return True
+        return False
+
+    def resolve_papers_from_urls(self, urls: List[str], folder: Optional[str] = None) -> List[PaperInfo]:
+        """Resolves multiple web or PDF URLs into a list of PaperInfo objects."""
+        papers = []
+        for u in urls:
+            u_clean = u.strip()
+            if not u_clean:
+                continue
+            p = self.resolve_paper_from_url(u_clean, folder=folder)
+            if p:
+                papers.append(p)
+        return papers
+
+    def resolve_paper_from_url(self, url: str, folder: Optional[str] = None) -> Optional[PaperInfo]:
+        """
+        Resolves an academic paper from a direct URL (arXiv, PDF link, Semantic Scholar, or academic publisher).
+        Extracts title, authors, year, abstract, and direct PDF download link.
+        """
+        import hashlib
+        import urllib.parse
+        clean_url = url.strip()
+        logger.info(f"Resolving paper from direct link: {clean_url}")
+
+        # 1. Handle arXiv URLs or arXiv IDs
+        arxiv_match = re.search(r"(?:arxiv\.org/(?:abs|pdf)/|arxiv:)?([0-9]{4}\.[0-9]{4,5}(?:v[0-9]+)?)", clean_url)
+        if arxiv_match:
+            arxiv_id = arxiv_match.group(1)
+            logger.info(f"Detected arXiv identifier: {arxiv_id}")
+            try:
+                abs_url = f"https://arxiv.org/abs/{arxiv_id}"
+                resp = self.session.get(abs_url, timeout=15)
+                if resp.status_code == 200:
+                    html = resp.text
+                    title_m = re.search(r'<meta\s+name=[\"\']citation_title[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                    if not title_m:
+                        title_m = re.search(r'<h1 class=\"title mathjax\"><span class=\"descriptor\">Title:</span>(.*?)</h1>', html, re.DOTALL)
+                    title = title_m.group(1).strip() if title_m else f"arXiv Paper {arxiv_id}"
+
+                    authors = re.findall(r'<meta\s+name=[\"\']citation_author[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                    if not authors:
+                        authors = ["arXiv Contributor"]
+
+                    date_m = re.search(r'<meta\s+name=[\"\']citation_date[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                    year = date_m.group(1)[:4] if date_m else "2024"
+
+                    abs_m = re.search(r'<blockquote class=\"abstract mathjax\"><span class=\"descriptor\">Abstract:</span>(.*?)</blockquote>', html, re.DOTALL)
+                    abstract = abs_m.group(1).strip() if abs_m else ""
+
+                    pdf_url = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
+                    logger.info(f"Successfully resolved arXiv paper: '{title}' ({year})")
+                    return PaperInfo(
+                        paper_id=f"arxiv_{arxiv_id.replace('.', '_')}",
+                        title=title,
+                        authors=authors,
+                        year=year,
+                        abstract=abstract,
+                        url=abs_url,
+                        pdf_url=pdf_url
+                    )
+            except Exception as e:
+                logger.warning(f"Failed to scrape arXiv page: {e}. Falling back to standard resolution.")
+
+        # 2. Handle Semantic Scholar URLs
+        s2_match = re.search(r"semanticscholar\.org/paper/(?:[^/]+/)?([a-f0-9]{40})", clean_url)
+        if s2_match:
+            paper_id = s2_match.group(1)
+            try:
+                api_url = f"https://api.semanticscholar.org/graph/v1/paper/{paper_id}?fields=title,authors,year,abstract,openAccessPdf,externalIds,url"
+                resp = self.session.get(api_url, timeout=15)
+                if resp.status_code == 200:
+                    d = resp.json()
+                    title = d.get("title") or "Untitled Paper"
+                    authors = [a.get("name", "") for a in d.get("authors", []) if a.get("name")]
+                    year = str(d.get("year") or "")
+                    abstract = d.get("abstract") or ""
+                    pdf_url = (d.get("openAccessPdf") or {}).get("url")
+                    return PaperInfo(paper_id=paper_id[:12], title=title, authors=authors, year=year, abstract=abstract, url=clean_url, pdf_url=pdf_url)
+            except Exception as e:
+                logger.warning(f"Failed Semantic Scholar API lookup: {e}")
+
+        # 3. Handle Direct PDF URL
+        is_pdf_url = clean_url.lower().endswith(".pdf") or "/pdf" in clean_url.lower()
+        if is_pdf_url:
+            try:
+                # Generate unique ID for this PDF
+                url_hash = hashlib.md5(clean_url.encode()).hexdigest()[:10]
+                target_folder = folder or config.RAW_PDF_DIR
+                os.makedirs(target_folder, exist_ok=True)
+                local_pdf_path = os.path.join(target_folder, f"user_paper_{url_hash}.pdf")
+
+                if not os.path.exists(local_pdf_path):
+                    logger.info(f"Downloading direct PDF from {clean_url}...")
+                    r = self.session.get(clean_url, stream=True, timeout=30)
+                    r.raise_for_status()
+                    with open(local_pdf_path, "wb") as f:
+                        for chunk in r.iter_content(chunk_size=8192):
+                            if chunk: f.write(chunk)
+
+                # Extract metadata from PDF with PyMuPDF
+                import fitz
+                doc = fitz.open(local_pdf_path)
+                meta_title = doc.metadata.get("title", "").strip()
+                meta_author = doc.metadata.get("author", "").strip()
+                first_page_text = doc[0].get_text() if len(doc) > 0 else ""
+
+                title = meta_title if (meta_title and len(meta_title) > 5 and "untitled" not in meta_title.lower()) else None
+                if not title:
+                    # Pick first non-empty line of text
+                    lines = [ln.strip() for ln in first_page_text.split("\n") if len(ln.strip()) > 5]
+                    title = lines[0] if lines else f"Research Paper {url_hash}"
+
+                authors = [meta_author] if meta_author else ["Research Author"]
+                year_match = re.search(r"\b(19\d\d|20\d\d)\b", first_page_text)
+                year = year_match.group(1) if year_match else "2024"
+
+                # Extract abstract if present
+                abstract = ""
+                abs_m = re.search(r"(?i)abstract[:\s\n]+(.*?)(?:\n\s*\n|1\.?\s+Introduction|Keywords)", first_page_text, re.DOTALL)
+                if abs_m:
+                    abstract = abs_m.group(1).strip()[:1000]
+                else:
+                    abstract = first_page_text[:600].strip()
+
+                doc.close()
+                logger.info(f"Resolved direct PDF: '{title}' ({year})")
+                return PaperInfo(
+                    paper_id=f"pdf_{url_hash}",
+                    title=title,
+                    authors=authors,
+                    year=year,
+                    abstract=abstract,
+                    url=clean_url,
+                    pdf_url=clean_url
+                )
+            except Exception as e:
+                logger.error(f"Error resolving direct PDF link {clean_url}: {e}")
+
+        # 4. Handle General Academic Webpage (DOI, Nature, ScienceDirect, OpenReview, IEEE, PubMed, etc.)
+        try:
+            logger.info(f"Fetching academic webpage metadata: {clean_url}")
+            resp = self.session.get(clean_url, timeout=20)
+            if resp.status_code == 200:
+                html = resp.text
+                url_hash = hashlib.md5(clean_url.encode()).hexdigest()[:10]
+
+                # Parse standard Highwire Press / Google Scholar meta tags
+                title_m = re.search(r'<meta\s+(?:name|property)=[\"\'](?:citation_title|og:title)[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                if not title_m:
+                    title_m = re.search(r'<title>(.*?)</title>', html, re.IGNORECASE)
+                title = title_m.group(1).strip() if title_m else f"Web Article {url_hash}"
+
+                authors = re.findall(r'<meta\s+name=[\"\']citation_author[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                if not authors:
+                    authors = ["Academic Author"]
+
+                date_m = re.search(r'<meta\s+name=[\"\'](?:citation_date|citation_publication_date)[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                year = date_m.group(1)[:4] if date_m else "2024"
+
+                abs_m = re.search(r'<meta\s+(?:name|property)=[\"\'](?:citation_abstract|description|og:description)[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                abstract = abs_m.group(1).strip() if abs_m else ""
+
+                # Look for direct PDF citation tag
+                pdf_m = re.search(r'<meta\s+name=[\"\']citation_pdf_url[\"\']\s+content=[\"\']([^\"\']+)[\"\']', html)
+                pdf_url = None
+                if pdf_m:
+                    pdf_url = urllib.parse.urljoin(clean_url, pdf_m.group(1))
+
+                # If no PDF is linkable, save extracted page text as markdown file directly
+                if not pdf_url:
+                    text_folder = config.PROCESSED_TEXT_DIR
+                    os.makedirs(text_folder, exist_ok=True)
+                    # Clean tags
+                    clean_text = re.sub(r'<(script|style).*?</\1>', '', html, flags=re.DOTALL | re.IGNORECASE)
+                    clean_text = re.sub(r'<[^>]+>', ' ', clean_text)
+                    clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+                    md_path = os.path.join(text_folder, f"web_{url_hash}.md")
+                    with open(md_path, "w", encoding="utf-8") as f:
+                        f.write(f"# {title}\n\n**Authors:** {', '.join(authors)}\n**Source:** {clean_url}\n\n## Content\n\n{clean_text[:30000]}")
+                    logger.info(f"Saved webpage text to: {md_path}")
+
+                logger.info(f"Successfully resolved web paper: '{title}' (PDF: {pdf_url})")
+                return PaperInfo(
+                    paper_id=f"web_{url_hash}",
+                    title=title,
+                    authors=authors,
+                    year=year,
+                    abstract=abstract,
+                    url=clean_url,
+                    pdf_url=pdf_url
+                )
+        except Exception as e:
+            logger.error(f"Error fetching web article {clean_url}: {e}")
+
+        return None
+
+    # ------------------------------------------------------------------
+    # Public search interface
     # ------------------------------------------------------------------
     def search_papers(self, query: str, limit: int = 3, bypass_cache: bool = False) -> tuple[List[PaperInfo], bool]:
         """
-        Search for papers by topic.
-        Tries ArXiv first; falls back to Semantic Scholar if ArXiv returns nothing.
+        Search for papers by topic OR resolve direct URL / arXiv ID.
         Returns (papers, was_cached).
         """
+        # Auto-detect if input is a direct URL or arXiv ID
+        if self.is_url(query):
+            logger.info(f"Detected direct paper link / identifier: '{query}'")
+            resolved = self.resolve_paper_from_url(query)
+            if resolved:
+                return [resolved], False
+            logger.warning(f"Could not resolve direct link: {query}. Proceeding with standard search.")
+
         if not bypass_cache:
             from src.config import config
             import re

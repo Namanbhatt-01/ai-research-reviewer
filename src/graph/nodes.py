@@ -48,11 +48,39 @@ def _get_topic_dirs(slug: str) -> Dict[str, str]:
 # 1. process_input
 # ----------------------------------------------------------------------
 def process_input(state: ResearchState) -> Dict[str, Any]:
-    topic = state.get("topic", "").strip()
-    if not topic:
-        topic = "Artificial Intelligence in Academic Research"
+    raw_topic = state.get("topic", "").strip()
+    paper_urls = state.get("paper_urls") or []
+
+    # Auto-detect if raw_topic contains URL(s)
+    urls_to_resolve = list(paper_urls)
+    if raw_topic and PaperRetriever.is_url(raw_topic):
+        split_urls = [u.strip() for u in re.split(r'[\s,]+', raw_topic) if PaperRetriever.is_url(u.strip())]
+        urls_to_resolve.extend(split_urls)
+
+    is_url_mode = len(urls_to_resolve) > 0
+    resolved_articles = []
+
+    if is_url_mode:
+        logger.info(f"[Node: process_input] Detected direct paper URL mode ({len(urls_to_resolve)} URL(s)). Resolving metadata...")
+        retriever = PaperRetriever()
+        for u in urls_to_resolve:
+            paper = retriever.resolve_paper_from_url(u)
+            if paper:
+                resolved_articles.append(paper.to_dict())
+
+    # Set appropriate topic name
+    if resolved_articles:
+        if raw_topic and not PaperRetriever.is_url(raw_topic):
+            topic = raw_topic
+        elif len(resolved_articles) == 1:
+            topic = f"Review of: {resolved_articles[0]['title']}"
+        else:
+            topic = f"Comparative Review: {resolved_articles[0]['title'][:30]} and related papers"
+    else:
+        topic = raw_topic if (raw_topic and not PaperRetriever.is_url(raw_topic)) else "Artificial Intelligence in Academic Research"
+
     slug = state.get("slug") or _topic_slug(topic)
-    limit = state.get("limit") or config.ARXIV_LIMIT_DEFAULT
+    limit = state.get("limit") or max(len(resolved_articles), config.ARXIV_LIMIT_DEFAULT)
 
     # Ensure directories
     _get_topic_dirs(slug)
@@ -61,12 +89,16 @@ def process_input(state: ResearchState) -> Dict[str, Any]:
     sm = StateManager()
     workflow = sm.get_or_create_workflow(topic, slug)
 
-    logger.info(f"[Node: process_input] Initialized workflow #{workflow['id']} for '{topic}' (slug: {slug})")
+    logger.info(f"[Node: process_input] Initialized workflow #{workflow['id']} for '{topic}' (slug: {slug}) [URL Mode: {is_url_mode}]")
     return {
         "topic": topic,
         "slug": slug,
         "limit": limit,
         "workflow_id": workflow["id"],
+        "paper_urls": urls_to_resolve,
+        "is_direct_url_mode": is_url_mode and len(resolved_articles) > 0,
+        "selected_articles": resolved_articles,
+        "raw_articles": resolved_articles,
         "revision_count": state.get("revision_count", 0),
         "max_revisions": state.get("max_revisions", 2),
         "search_cycle": state.get("search_cycle", 0),
@@ -147,6 +179,27 @@ def researcher(state: ResearchState) -> Dict[str, Any]:
 # 4. search_articles
 # ----------------------------------------------------------------------
 def search_articles(state: ResearchState) -> Dict[str, Any]:
+    # If in direct URL mode and papers are already provided, bypass broad search
+    if state.get("is_direct_url_mode") and state.get("selected_articles"):
+        logger.info(f"[Node: search_articles] Papers provided directly via link ({len(state['selected_articles'])}). Preserving input papers.")
+        slug = state["slug"]
+        dirs = _get_topic_dirs(slug)
+        cycle = state.get("search_cycle", 0)
+        sm = StateManager()
+        task_id = sm.create_or_start_task(state.get("workflow_id", 1), f"retrieval_{cycle}")
+
+        with open(os.path.join(dirs["metadata"], "papers.json"), "w", encoding="utf-8") as f:
+            json.dump(state["selected_articles"], f, indent=4)
+        sm.log_artifact(task_id, "papers_json", os.path.join(dirs["metadata"], "papers.json"))
+        sm.mark_task_complete(task_id)
+
+        return {
+            "raw_articles": state["selected_articles"],
+            "needs_more_research": False,
+            "secondary_query": None,
+            "current_step": "search_articles",
+        }
+
     query = state.get("research_query") or state.get("topic")
     limit = state.get("limit", 3)
     slug = state["slug"]
@@ -203,6 +256,13 @@ def search_articles(state: ResearchState) -> Dict[str, Any]:
 # 5. article_decisions
 # ----------------------------------------------------------------------
 def article_decisions(state: ResearchState) -> Dict[str, Any]:
+    if state.get("is_direct_url_mode") and state.get("selected_articles"):
+        logger.info(f"[Node: article_decisions] Using {len(state['selected_articles'])} user-specified paper(s).")
+        return {
+            "selected_articles": state["selected_articles"],
+            "current_step": "article_decisions",
+        }
+
     articles = state.get("raw_articles", [])
     limit = state.get("limit", 3)
     logger.info(f"[Node: article_decisions] Filtering & picking top {limit} papers from {len(articles)} candidates.")

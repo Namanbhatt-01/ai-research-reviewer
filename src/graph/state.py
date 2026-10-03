@@ -10,6 +10,8 @@ class ResearchState(TypedDict, total=False):
     slug: str
     limit: int
     workflow_id: Optional[int]
+    paper_urls: Optional[List[str]]
+    is_direct_url_mode: bool
     
     # State tracking
     current_step: str

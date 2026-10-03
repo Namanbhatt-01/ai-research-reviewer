@@ -187,9 +187,9 @@ def create_gradio_app():
         with gr.Row():
             with gr.Column(scale=3):
                 topic_input = gr.Textbox(
-                    label="Research Topic / Query",
-                    placeholder="e.g., Quantum Key Distribution protocols in satellite communications",
-                    value="Quantum Cryptography in Satellite Communications",
+                    label="Research Topic OR Direct Paper Link (Web / PDF URL)",
+                    placeholder="Enter topic (e.g. Quantum Computing) OR paste link (e.g. https://arxiv.org/abs/1706.03762 or direct .pdf link)",
+                    value="https://arxiv.org/abs/1706.03762",
                 )
             with gr.Column(scale=1):
                 limit_slider = gr.Slider(minimum=1, maximum=5, value=3, step=1, label="Max Papers")
@@ -199,6 +199,16 @@ def create_gradio_app():
         with gr.Row():
             run_btn = gr.Button("🚀 Run Autonomous Review", variant="primary", scale=2)
             critique_btn = gr.Button("✍️ Critique / Revise Draft", variant="secondary", scale=1)
+
+        gr.Examples(
+            examples=[
+                ["https://arxiv.org/abs/1706.03762", 1, 1],
+                ["https://arxiv.org/abs/2303.08774", 1, 1],
+                ["Quantum Cryptography in Satellite Communications", 3, 1],
+            ],
+            inputs=[topic_input, limit_slider, rev_slider],
+            label="Quick Test Examples (Direct Links & Topics)",
+        )
 
         status_box = gr.Markdown("**Status:** Ready.")
 

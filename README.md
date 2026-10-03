@@ -111,6 +111,7 @@ graph TD;
 ## ⚡ Key Features
 
 - **Stateful LangGraph Orchestration**: Built with cyclic execution, fan-out parallel drafting, and intelligent self-reflection.
+- **Direct Paper Link & PDF Support (Web/PDF)**: Feed any academic paper link (e.g. arXiv abstract, Nature, ScienceDirect, OpenReview, or direct `.pdf` link). The system automatically resolves metadata, retrieves the PDF, and initiates deep section drafting without manual searches.
 - **Smart Dual Retrieval**: Semantic Scholar as primary open-access provider with automatic fallback to arXiv.
 - **Rich Document Extraction**: Converts multi-column academic PDFs to clean Markdown using `PyMuPDF4LLM`.
 - **Parallel Fan-out Section Drafting**: Synthesizes Abstract, Introduction, Methods, Results, Conclusion, and APA References simultaneously.
@@ -165,8 +166,22 @@ APP_API_KEY=research_secret_123
 
 ### 1. Autonomous CLI Execution
 Execute the entire LangGraph workflow directly from your terminal:
+
+**A. By Topic Search:**
 ```bash
 python main.py run "Quantum Key Distribution in Satellite Networks" --limit 3
+```
+
+**B. By Direct Paper Link (Web or PDF URL):**
+```bash
+# Review an arXiv paper directly
+python main.py run "https://arxiv.org/abs/1706.03762"
+
+# Review a direct PDF link
+python main.py run "https://arxiv.org/pdf/1706.03762.pdf"
+
+# Review multiple papers via --url flag
+python main.py run --url "https://arxiv.org/abs/1706.03762,https://arxiv.org/abs/2303.08774"
 ```
 
 ### 2. Interactive Modern Web Dashboard
