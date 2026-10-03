@@ -26,6 +26,7 @@ An autonomous, multi-agent AI system designed to conduct systematic literature r
   - [3. Graph Visualization & Export](#3-graph-visualization--export)
 - [Project Structure](#-project-structure)
 - [Quality Scoring & Peer-Review Heuristics](#-quality-scoring--peer-review-heuristics)
+- [Internship Certificate](#-internship-certificate-of-completion)
 - [License & Acknowledgments](#-license--acknowledgments)
 
 ---
@@ -262,6 +263,19 @@ The `DraftReviewer` module evaluates each generated draft across four dimensions
 4. **Citation Usage**: Regex-based verification of `(Author, Year)` and `(Author et al., Year)` in-text citations.
 
 If any section scores below the threshold (`REVIEW_PASSING_SCORE = 7`), the system triggers an automatic rewrite prompt with precise feedback.
+
+---
+
+## 🎓 Internship Certificate of Completion
+
+> **Infosys Springboard Internship 6.0 (Batch 13)**  
+> **Project:** *AI System to Review and Summarize Research Papers*  
+> **Conducted:** *February 5, 2026 – April 3, 2026*  
+> **Verification Portal:** [verify.onwingspan.com](https://verify.onwingspan.com)
+
+<p align="center">
+  <img src="docs/certificate_of_completion.png" alt="Infosys Springboard Certificate of Completion - Naman Bhatt" width="800"/>
+</p>
 
 ---
 
